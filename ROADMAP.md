@@ -24,14 +24,14 @@ Policy: no manual implementation if a library already does it.
 
 ## Phase 3 — Timecoded mode
 
-- [ ] `file_picker` integration: select an audio file on the phone
-- [ ] Copy the selected audio file into the app's documents folder
-- [ ] `just_audio` integration: play, pause, seek
-- [ ] `audio_waveforms` integration: waveform display to visually align timecodes
-- [ ] Per-line timecode-setting UI ("mark this line at time T" during playback)
-- [ ] Persist timecodes in the database, linked to each `Ligne`
-- [ ] Lyrics scrolling synced to the current playback position
-- [ ] Support timecodes without an audio file (manual placement of time markers)
+- [x] `file_picker` integration: select an audio file on the phone
+- [x] Copy the selected audio file into the app's documents folder
+- [x] `just_audio` integration: play, pause, seek
+- [x] `just_waveform` integration: waveform display to visually align timecodes (swapped for `audio_waveforms`, which has no macOS support — see commit history)
+- [x] Per-line timecode-setting UI ("mark this line at time T" during playback)
+- [x] Persist timecodes in the database, linked to each `Ligne`
+- [x] Lyrics scrolling synced to the current playback position
+- [x] Support timecodes without an audio file (manual placement of time markers)
 
 ## Phase 4 — Export and file management
 
