@@ -51,4 +51,5 @@ Keep new files inside these folders. Only add a new top-level folder under `lib/
 ## Local environment notes
 
 - Flutter SDK lives at `~/Applications/flutter` — not on PATH by default in fresh shells. If `flutter`/`dart` commands aren't found, prepend `$HOME/Applications/flutter/bin` to `PATH` for that shell.
-- Android toolchain (cmdline-tools) and iOS Simulator runtime are not installed yet on this machine. Until that's addressed, develop and manually verify against **macOS desktop** and **Chrome** targets; revisit before Phase 6 (Android APK / iOS ad-hoc builds).
+- The iOS Simulator (iPhone 17) is available and is the primary manual-verification target. Android toolchain (cmdline-tools) is not installed yet; revisit before Phase 6 (Android APK build).
+- **When verifying a change on the iOS Simulator, always `attach` the simulator panel (not just take private screenshots) so the user can watch the live session.** Do this before building/launching, per the simulator tool's own guidance.
