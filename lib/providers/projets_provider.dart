@@ -36,9 +36,14 @@ class ProjetsController {
     required int id,
     required String nom,
     required String langue,
+    String? lienProd,
   }) {
     return (_db.update(_db.projets)..where((row) => row.id.equals(id))).write(
-      ProjetsCompanion(nom: Value(nom), langueParDefaut: Value(langue)),
+      ProjetsCompanion(
+        nom: Value(nom),
+        langueParDefaut: Value(langue),
+        lienProd: Value(lienProd),
+      ),
     );
   }
 

@@ -29,16 +29,22 @@ void main() {
     expect(projets.single.langueParDefaut, 'en');
   });
 
-  test('update changes the project name and language', () async {
+  test('update changes the project name, language, and prod link', () async {
     final projetId = await db
         .into(db.projets)
         .insert(ProjetsCompanion.insert(nom: 'Old name'));
 
-    await controller.update(id: projetId, nom: 'New name', langue: 'en');
+    await controller.update(
+      id: projetId,
+      nom: 'New name',
+      langue: 'en',
+      lienProd: 'https://example.com/beat',
+    );
 
     final updated = await db.select(db.projets).getSingle();
     expect(updated.nom, 'New name');
     expect(updated.langueParDefaut, 'en');
+    expect(updated.lienProd, 'https://example.com/beat');
   });
 
   test('delete removes the project, its lines, and its audio file', () async {

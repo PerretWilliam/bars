@@ -8,6 +8,7 @@ class Projets extends Table {
   TextColumn get nom => text()();
   TextColumn get langueParDefaut => text().withDefault(const Constant('fr'))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  TextColumn get lienProd => text().nullable()();
 }
 
 class Lignes extends Table {
@@ -52,7 +53,7 @@ class AppDatabase extends _$AppDatabase {
   // 100k+ row table; without indices those scans are slow enough to lose
   // the race with Riverpod's default provider auto-disposal.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -64,6 +65,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 3) {
         await m.createIndex(idxRhymesMot);
         await m.createIndex(idxRhymesRimeKey);
+      }
+      if (from < 4) {
+        await m.addColumn(projets, projets.lienProd);
       }
     },
     // SQLite ignores declared `onDelete: KeyAction.cascade` foreign keys

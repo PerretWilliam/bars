@@ -54,8 +54,25 @@ class $ProjetsTable extends Projets with TableInfo<$ProjetsTable, Projet> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _lienProdMeta = const VerificationMeta(
+    'lienProd',
+  );
   @override
-  List<GeneratedColumn> get $columns => [id, nom, langueParDefaut, createdAt];
+  late final GeneratedColumn<String> lienProd = GeneratedColumn<String>(
+    'lien_prod',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    nom,
+    langueParDefaut,
+    createdAt,
+    lienProd,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -94,6 +111,12 @@ class $ProjetsTable extends Projets with TableInfo<$ProjetsTable, Projet> {
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('lien_prod')) {
+      context.handle(
+        _lienProdMeta,
+        lienProd.isAcceptableOrUnknown(data['lien_prod']!, _lienProdMeta),
+      );
+    }
     return context;
   }
 
@@ -119,6 +142,10 @@ class $ProjetsTable extends Projets with TableInfo<$ProjetsTable, Projet> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      lienProd: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lien_prod'],
+      ),
     );
   }
 
@@ -133,11 +160,13 @@ class Projet extends DataClass implements Insertable<Projet> {
   final String nom;
   final String langueParDefaut;
   final DateTime createdAt;
+  final String? lienProd;
   const Projet({
     required this.id,
     required this.nom,
     required this.langueParDefaut,
     required this.createdAt,
+    this.lienProd,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -146,6 +175,9 @@ class Projet extends DataClass implements Insertable<Projet> {
     map['nom'] = Variable<String>(nom);
     map['langue_par_defaut'] = Variable<String>(langueParDefaut);
     map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || lienProd != null) {
+      map['lien_prod'] = Variable<String>(lienProd);
+    }
     return map;
   }
 
@@ -155,6 +187,9 @@ class Projet extends DataClass implements Insertable<Projet> {
       nom: Value(nom),
       langueParDefaut: Value(langueParDefaut),
       createdAt: Value(createdAt),
+      lienProd: lienProd == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lienProd),
     );
   }
 
@@ -168,6 +203,7 @@ class Projet extends DataClass implements Insertable<Projet> {
       nom: serializer.fromJson<String>(json['nom']),
       langueParDefaut: serializer.fromJson<String>(json['langueParDefaut']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      lienProd: serializer.fromJson<String?>(json['lienProd']),
     );
   }
   @override
@@ -178,6 +214,7 @@ class Projet extends DataClass implements Insertable<Projet> {
       'nom': serializer.toJson<String>(nom),
       'langueParDefaut': serializer.toJson<String>(langueParDefaut),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'lienProd': serializer.toJson<String?>(lienProd),
     };
   }
 
@@ -186,11 +223,13 @@ class Projet extends DataClass implements Insertable<Projet> {
     String? nom,
     String? langueParDefaut,
     DateTime? createdAt,
+    Value<String?> lienProd = const Value.absent(),
   }) => Projet(
     id: id ?? this.id,
     nom: nom ?? this.nom,
     langueParDefaut: langueParDefaut ?? this.langueParDefaut,
     createdAt: createdAt ?? this.createdAt,
+    lienProd: lienProd.present ? lienProd.value : this.lienProd,
   );
   Projet copyWithCompanion(ProjetsCompanion data) {
     return Projet(
@@ -200,6 +239,7 @@ class Projet extends DataClass implements Insertable<Projet> {
           ? data.langueParDefaut.value
           : this.langueParDefaut,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      lienProd: data.lienProd.present ? data.lienProd.value : this.lienProd,
     );
   }
 
@@ -209,13 +249,15 @@ class Projet extends DataClass implements Insertable<Projet> {
           ..write('id: $id, ')
           ..write('nom: $nom, ')
           ..write('langueParDefaut: $langueParDefaut, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('lienProd: $lienProd')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, nom, langueParDefaut, createdAt);
+  int get hashCode =>
+      Object.hash(id, nom, langueParDefaut, createdAt, lienProd);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -223,7 +265,8 @@ class Projet extends DataClass implements Insertable<Projet> {
           other.id == this.id &&
           other.nom == this.nom &&
           other.langueParDefaut == this.langueParDefaut &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.lienProd == this.lienProd);
 }
 
 class ProjetsCompanion extends UpdateCompanion<Projet> {
@@ -231,29 +274,34 @@ class ProjetsCompanion extends UpdateCompanion<Projet> {
   final Value<String> nom;
   final Value<String> langueParDefaut;
   final Value<DateTime> createdAt;
+  final Value<String?> lienProd;
   const ProjetsCompanion({
     this.id = const Value.absent(),
     this.nom = const Value.absent(),
     this.langueParDefaut = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.lienProd = const Value.absent(),
   });
   ProjetsCompanion.insert({
     this.id = const Value.absent(),
     required String nom,
     this.langueParDefaut = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.lienProd = const Value.absent(),
   }) : nom = Value(nom);
   static Insertable<Projet> custom({
     Expression<int>? id,
     Expression<String>? nom,
     Expression<String>? langueParDefaut,
     Expression<DateTime>? createdAt,
+    Expression<String>? lienProd,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (nom != null) 'nom': nom,
       if (langueParDefaut != null) 'langue_par_defaut': langueParDefaut,
       if (createdAt != null) 'created_at': createdAt,
+      if (lienProd != null) 'lien_prod': lienProd,
     });
   }
 
@@ -262,12 +310,14 @@ class ProjetsCompanion extends UpdateCompanion<Projet> {
     Value<String>? nom,
     Value<String>? langueParDefaut,
     Value<DateTime>? createdAt,
+    Value<String?>? lienProd,
   }) {
     return ProjetsCompanion(
       id: id ?? this.id,
       nom: nom ?? this.nom,
       langueParDefaut: langueParDefaut ?? this.langueParDefaut,
       createdAt: createdAt ?? this.createdAt,
+      lienProd: lienProd ?? this.lienProd,
     );
   }
 
@@ -286,6 +336,9 @@ class ProjetsCompanion extends UpdateCompanion<Projet> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (lienProd.present) {
+      map['lien_prod'] = Variable<String>(lienProd.value);
+    }
     return map;
   }
 
@@ -295,7 +348,8 @@ class ProjetsCompanion extends UpdateCompanion<Projet> {
           ..write('id: $id, ')
           ..write('nom: $nom, ')
           ..write('langueParDefaut: $langueParDefaut, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('lienProd: $lienProd')
           ..write(')'))
         .toString();
   }
@@ -1359,12 +1413,14 @@ typedef $$ProjetsTableCreateCompanionBuilder = ProjetsCompanion Function({
   required String nom,
   Value<String> langueParDefaut,
   Value<DateTime> createdAt,
+  Value<String?> lienProd,
 });
 typedef $$ProjetsTableUpdateCompanionBuilder = ProjetsCompanion Function({
   Value<int> id,
   Value<String> nom,
   Value<String> langueParDefaut,
   Value<DateTime> createdAt,
+  Value<String?> lienProd,
 });
 
 final class $$ProjetsTableReferences
@@ -1436,6 +1492,11 @@ class $$ProjetsTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lienProd => $composableBuilder(
+    column: $table.lienProd,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1518,6 +1579,11 @@ class $$ProjetsTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get lienProd => $composableBuilder(
+    column: $table.lienProd,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ProjetsTableAnnotationComposer
@@ -1542,6 +1608,9 @@ class $$ProjetsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get lienProd =>
+      $composableBuilder(column: $table.lienProd, builder: (column) => column);
 
   Expression<T> lignesRefs<T extends Object>(
     Expression<T> Function($$LignesTableAnnotationComposer a) f,
@@ -1626,11 +1695,13 @@ class $$ProjetsTableTableManager
                 Value<String> nom = const Value.absent(),
                 Value<String> langueParDefaut = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<String?> lienProd = const Value.absent(),
               }) => ProjetsCompanion(
                 id: id,
                 nom: nom,
                 langueParDefaut: langueParDefaut,
                 createdAt: createdAt,
+                lienProd: lienProd,
               ),
           createCompanionCallback:
               ({
@@ -1638,11 +1709,13 @@ class $$ProjetsTableTableManager
                 required String nom,
                 Value<String> langueParDefaut = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<String?> lienProd = const Value.absent(),
               }) => ProjetsCompanion.insert(
                 id: id,
                 nom: nom,
                 langueParDefaut: langueParDefaut,
                 createdAt: createdAt,
+                lienProd: lienProd,
               ),
           withReferenceMapper: (p0) => p0
               .map(

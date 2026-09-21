@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../providers/projets_provider.dart';
 
@@ -18,6 +19,7 @@ class ProjectInfoScreen extends ConsumerStatefulWidget {
 class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _prodLinkController = TextEditingController();
   String? _language;
   bool _isSubmitting = false;
   bool _initialized = false;
@@ -25,6 +27,7 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _prodLinkController.dispose();
     super.dispose();
   }
 
@@ -33,17 +36,25 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
 
     setState(() => _isSubmitting = true);
     try {
+      final lienProd = _prodLinkController.text.trim();
       await ref
           .read(projetsControllerProvider)
           .update(
             id: widget.projetId,
             nom: _nameController.text.trim(),
             langue: _language!,
+            lienProd: lienProd.isEmpty ? null : lienProd,
           );
       if (mounted) context.pop();
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
+  }
+
+  Future<void> _openProdLink() async {
+    final url = Uri.tryParse(_prodLinkController.text.trim());
+    if (url == null) return;
+    await launchUrl(url, mode: LaunchMode.externalApplication);
   }
 
   @override
@@ -60,6 +71,7 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
           if (!_initialized) {
             _nameController.text = projet.nom;
             _language = projet.langueParDefaut;
+            _prodLinkController.text = projet.lienProd ?? '';
             _initialized = true;
           }
           return Padding(
@@ -96,6 +108,28 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
                         .toList(),
                     onChanged: (value) {
                       if (value != null) setState(() => _language = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _prodLinkController,
+                    decoration: InputDecoration(
+                      labelText: 'Prod link (optional)',
+                      hintText: 'https://…',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.open_in_new),
+                        tooltip: 'Open link',
+                        onPressed: _openProdLink,
+                      ),
+                    ),
+                    keyboardType: TextInputType.url,
+                    validator: (value) {
+                      final trimmed = value?.trim() ?? '';
+                      if (trimmed.isEmpty) return null;
+                      final uri = Uri.tryParse(trimmed);
+                      return uri != null && uri.hasScheme
+                          ? null
+                          : 'Enter a valid URL';
                     },
                   ),
                   const SizedBox(height: 24),

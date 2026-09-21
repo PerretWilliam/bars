@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_waveform/just_waveform.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/app_database.dart';
 import '../../providers/audio_provider.dart';
@@ -49,12 +50,19 @@ class ProjectEditorScreen extends ConsumerWidget {
     await FilePicker.saveFile(fileName: export.fileName, bytes: export.bytes);
   }
 
+  Future<void> _openProdLink(String lienProd) async {
+    final url = Uri.tryParse(lienProd);
+    if (url == null) return;
+    await launchUrl(url, mode: LaunchMode.externalApplication);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lignesAsync = ref.watch(lignesForProjetProvider(projetId));
     final audio = ref.watch(audioForProjetProvider(projetId)).value;
     final controller = ref.read(lignesControllerProvider);
     final showTimecode = ref.watch(timecodeVisibleProvider);
+    final lienProd = ref.watch(projetProvider(projetId)).value?.lienProd;
 
     return Scaffold(
       appBar: AppBar(
@@ -134,6 +142,7 @@ class ProjectEditorScreen extends ConsumerWidget {
         onProjectInfo: () => context.push('/project/$projetId/info'),
         onExportProject: () => _exportProject(ref),
         onDictionaries: () => context.push('/dictionaries'),
+        onOpenProd: lienProd == null ? null : () => _openProdLink(lienProd),
       ),
     );
   }
@@ -162,6 +171,7 @@ class _AddFab extends StatefulWidget {
     required this.onProjectInfo,
     required this.onExportProject,
     required this.onDictionaries,
+    this.onOpenProd,
   });
 
   final VoidCallback onAddLine;
@@ -169,6 +179,9 @@ class _AddFab extends StatefulWidget {
   final VoidCallback onProjectInfo;
   final VoidCallback onExportProject;
   final VoidCallback onDictionaries;
+
+  /// Null when the project has no prod link set, hiding that mini-FAB.
+  final VoidCallback? onOpenProd;
 
   @override
   State<_AddFab> createState() => _AddFabState();
@@ -227,6 +240,13 @@ class _AddFabState extends State<_AddFab> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         if (_expanded) ...[
+          if (widget.onOpenProd case final onOpenProd?)
+            _miniFab(
+              heroTag: 'openProdFab',
+              label: 'Open prod',
+              icon: Icons.link,
+              onPressed: onOpenProd,
+            ),
           _miniFab(
             heroTag: 'dictionariesFab',
             label: 'Rhyme dictionaries',

@@ -6,6 +6,7 @@ import 'package:lyrics/data/app_database.dart';
 import 'package:lyrics/providers/audio_provider.dart';
 import 'package:lyrics/providers/database_provider.dart';
 import 'package:lyrics/providers/lignes_provider.dart';
+import 'package:lyrics/providers/projets_provider.dart';
 import 'package:lyrics/ui/screens/project_editor_screen.dart';
 
 void main() {
@@ -18,6 +19,7 @@ void main() {
           audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
           lignesForProjetProvider(1)
               .overrideWith((ref) => Stream.value(<Ligne>[])),
+          projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
         child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
       ),
@@ -53,6 +55,7 @@ void main() {
           audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
           lignesForProjetProvider(1)
               .overrideWith((ref) => Stream.value([ligne])),
+          projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
         child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
       ),
@@ -95,6 +98,7 @@ void main() {
           audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
           lignesForProjetProvider(1)
               .overrideWith((ref) => Stream.value([ligne])),
+          projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
         child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
       ),
@@ -135,6 +139,7 @@ void main() {
             audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
             lignesForProjetProvider(1)
                 .overrideWith((ref) => Stream.value(lignes)),
+            projetProvider(1).overrideWith((ref) => Stream.value(null)),
           ],
           child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
         ),
@@ -161,6 +166,7 @@ void main() {
           audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
           lignesForProjetProvider(1)
               .overrideWith((ref) => Stream.value(lignes)),
+          projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
         child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
       ),
@@ -193,6 +199,7 @@ void main() {
           audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
           lignesForProjetProvider(1)
               .overrideWith((ref) => Stream.value([ligne])),
+          projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
         child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
       ),
@@ -217,5 +224,58 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(await db.select(db.lignes).get(), isEmpty);
+  });
+
+  testWidgets(
+    'the + FAB only shows "Open prod" when the project has a prod link',
+    (tester) async {
+      final projet = Projet(
+        id: 1,
+        nom: 'Test project',
+        langueParDefaut: 'fr',
+        createdAt: DateTime(2026),
+        lienProd: 'https://example.com/beat',
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
+            lignesForProjetProvider(1)
+                .overrideWith((ref) => Stream.value(<Ligne>[])),
+            projetProvider(1).overrideWith((ref) => Stream.value(projet)),
+          ],
+          child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+        ),
+      );
+      await tester.pump();
+
+      await tester.longPress(find.byIcon(Icons.add));
+      await tester.pump();
+
+      expect(find.byTooltip('Open prod'), findsOneWidget);
+    },
+  );
+
+  testWidgets('the + FAB hides "Open prod" when the project has no prod link', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
+          lignesForProjetProvider(1)
+              .overrideWith((ref) => Stream.value(<Ligne>[])),
+          projetProvider(1).overrideWith((ref) => Stream.value(null)),
+        ],
+        child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+      ),
+    );
+    await tester.pump();
+
+    await tester.longPress(find.byIcon(Icons.add));
+    await tester.pump();
+
+    expect(find.byTooltip('Open prod'), findsNothing);
   });
 }

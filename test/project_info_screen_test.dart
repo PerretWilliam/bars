@@ -48,7 +48,11 @@ void main() {
     expect(find.text('Old name'), findsOneWidget);
     expect(find.text('French'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextFormField), 'New name');
+    await tester.enterText(find.byType(TextFormField).at(0), 'New name');
+    await tester.enterText(
+      find.byType(TextFormField).at(1),
+      'https://example.com/beat',
+    );
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
@@ -56,5 +60,6 @@ void main() {
       db.projets,
     )..where((row) => row.id.equals(projetId))).getSingle();
     expect(updated.nom, 'New name');
+    expect(updated.lienProd, 'https://example.com/beat');
   });
 }
