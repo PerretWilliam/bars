@@ -27,6 +27,10 @@
 
 See [ROADMAP.md](ROADMAP.md) for the phased implementation plan and [CLAUDE.md](CLAUDE.md) for contributor guidance.
 
+## Why Bars?
+
+Most rap-writing apps ([RhymeFlux](https://rhymeflux.com/pricing/), [Rhymer's Block](https://rhymeflux.com/alternatives/best-rhymers-block-alternative/), and similar) cap free usage at one or a few songs and put the rest behind a $15/month-ish subscription. Bars has no account, no song limit, and no paywall — it's free and open source, full stop.
+
 ## Getting started
 
 ```bash

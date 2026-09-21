@@ -241,6 +241,9 @@
     }
   },
 
+  "aboutTagline": "Free, unlimited, no account — and open source.",
+  "@aboutTagline": {"description": "Short tagline on the About screen, distinguishing the app from paid competitors"},
+
   "authorWebsiteTooltip": "Visit my website",
   "@authorWebsiteTooltip": {"description": "Tooltip for the link to the author's personal website"},
 

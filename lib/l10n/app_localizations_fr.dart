@@ -241,6 +241,10 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get aboutTagline =>
+      'Gratuite, sans limite, sans compte — et open source.';
+
+  @override
   String get authorWebsiteTooltip => 'Visiter mon site';
 
   @override

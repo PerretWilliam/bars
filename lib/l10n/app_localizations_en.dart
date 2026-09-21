@@ -235,6 +235,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get aboutTagline => 'Free, unlimited, no account — and open source.';
+
+  @override
   String get authorWebsiteTooltip => 'Visit my website';
 
   @override

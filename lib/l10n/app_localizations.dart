@@ -518,6 +518,12 @@ abstract class AppLocalizations {
   /// **'Version {version}'**
   String appVersionLabel(String version);
 
+  /// Short tagline on the About screen, distinguishing the app from paid competitors
+  ///
+  /// In en, this message translates to:
+  /// **'Free, unlimited, no account — and open source.'**
+  String get aboutTagline;
+
   /// Tooltip for the link to the author's personal website
   ///
   /// In en, this message translates to:
