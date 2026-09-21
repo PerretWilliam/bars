@@ -26,6 +26,7 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
   final _itemPositionsListener = ItemPositionsListener.create();
   AudioPlayer? _player;
   StreamSubscription<Duration>? _positionSub;
+  StreamSubscription<PlayerState>? _playerStateSub;
   String? _loadedAudioPath;
   int? _lastScrolledIndex;
   int? _currentLineIndex;
@@ -45,6 +46,7 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
   @override
   void dispose() {
     _positionSub?.cancel();
+    _playerStateSub?.cancel();
     _player?.dispose();
     _virtualClockTimer?.cancel();
     WakelockPlus.disable();
@@ -61,7 +63,22 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
       _virtualClockTimer = Timer.periodic(const Duration(milliseconds: 200), (
         _,
       ) {
-        _virtualPosition += const Duration(milliseconds: 200);
+        final lignes = ref.read(lignesForProjetProvider(widget.projetId)).value;
+        final endMs = _lastTimecodeMs(lignes);
+        var nextMs = _virtualPosition.inMilliseconds + 200;
+
+        if (endMs != null && nextMs >= endMs) {
+          if (ref.read(rapModeLoopProvider)) {
+            nextMs = _firstTimecodeMs(lignes) ?? 0;
+          } else {
+            _virtualPosition = Duration(milliseconds: endMs);
+            _onPosition(_virtualPosition);
+            _virtualClockTimer?.cancel();
+            if (mounted) setState(() => _virtualPlaying = false);
+            return;
+          }
+        }
+        _virtualPosition = Duration(milliseconds: nextMs);
         _onPosition(_virtualPosition);
       });
     } else {
@@ -69,13 +86,44 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
     }
   }
 
+  void _toggleLoop() {
+    ref.read(rapModeLoopProvider.notifier).toggle();
+    final loop = ref.read(rapModeLoopProvider);
+    _player?.setLoopMode(loop ? LoopMode.one : LoopMode.off);
+  }
+
+  /// Jumps playback (or the virtual clock) straight to a line's timecode.
+  /// Lines without a timecode aren't seekable targets.
+  void _seekTo(int? timecodeMs) {
+    if (timecodeMs == null) return;
+    final position = Duration(milliseconds: timecodeMs);
+    if (_player != null) {
+      _player!.seek(position);
+    } else {
+      _virtualPosition = position;
+      _onPosition(position);
+    }
+  }
+
   Future<void> _ensurePlayerLoaded(Audio audio) async {
     if (_loadedAudioPath == audio.cheminLocal) return;
     _loadedAudioPath = audio.cheminLocal;
     final player = _player ??= AudioPlayer();
+    await player.setLoopMode(
+      ref.read(rapModeLoopProvider) ? LoopMode.one : LoopMode.off,
+    );
     await player.setFilePath(audio.cheminLocal);
     unawaited(_positionSub?.cancel());
     _positionSub = player.positionStream.listen(_onPosition);
+    unawaited(_playerStateSub?.cancel());
+    _playerStateSub = player.playerStateStream.listen(_onPlayerState);
+  }
+
+  void _onPlayerState(PlayerState state) {
+    if (state.processingState == ProcessingState.completed &&
+        !ref.read(rapModeLoopProvider)) {
+      _player?.pause();
+    }
   }
 
   void _onPosition(Duration position) {
@@ -118,12 +166,37 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
     return active;
   }
 
+  int? _lastTimecodeMs(List<Ligne>? lignes) {
+    if (lignes == null) return null;
+    int? last;
+    for (final ligne in lignes) {
+      final timecodeMs = ligne.timecodeMs;
+      if (timecodeMs != null && (last == null || timecodeMs > last)) {
+        last = timecodeMs;
+      }
+    }
+    return last;
+  }
+
+  int? _firstTimecodeMs(List<Ligne>? lignes) {
+    if (lignes == null) return null;
+    int? first;
+    for (final ligne in lignes) {
+      final timecodeMs = ligne.timecodeMs;
+      if (timecodeMs != null && (first == null || timecodeMs < first)) {
+        first = timecodeMs;
+      }
+    }
+    return first;
+  }
+
   @override
   Widget build(BuildContext context) {
     final lignesAsync = ref.watch(lignesForProjetProvider(widget.projetId));
     final audio = ref.watch(audioForProjetProvider(widget.projetId)).value;
     final subMode = ref.watch(rapModeSubModeProvider);
     final fontSize = ref.watch(rapModeFontSizeProvider);
+    final loop = ref.watch(rapModeLoopProvider);
 
     if (audio != null) {
       unawaited(_ensurePlayerLoaded(audio));
@@ -148,25 +221,42 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                         itemScrollController: _itemScrollController,
                         itemPositionsListener: _itemPositionsListener,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
+                          horizontal: 16,
                           vertical: 96,
                         ),
                         itemCount: lignes.length,
                         itemBuilder: (context, index) {
+                          final ligne = lignes[index];
                           final isCurrent = index == _currentLineIndex;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Text(
-                              lignes[index].texte,
-                              style: TextStyle(
+                          return GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => _seekTo(ligne.timecodeMs),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 250),
+                              curve: Curves.easeOut,
+                              margin: const EdgeInsets.symmetric(vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
                                 color: isCurrent
-                                    ? Colors.white
-                                    : Colors.white38,
-                                fontSize: fontSize,
-                                fontWeight: isCurrent
-                                    ? FontWeight.w700
-                                    : FontWeight.w500,
-                                height: 1.4,
+                                    ? Colors.deepPurple.withValues(alpha: 0.35)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: AnimatedDefaultTextStyle(
+                                duration: const Duration(milliseconds: 250),
+                                curve: Curves.easeOut,
+                                style: TextStyle(
+                                  color: isCurrent
+                                      ? Colors.white
+                                      : Colors.white38,
+                                  fontSize: fontSize,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.4,
+                                ),
+                                child: Text(ligne.texte),
                               ),
                             ),
                           );
@@ -190,6 +280,8 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                   child: _RapModeControls(
                     subMode: subMode,
                     fontSize: fontSize,
+                    loop: loop,
+                    onToggleLoop: _toggleLoop,
                     player: audio != null ? _player : null,
                     virtualPlaying: _virtualPlaying,
                     onToggleVirtualClock: _toggleVirtualClock,
@@ -211,6 +303,8 @@ class _RapModeControls extends ConsumerWidget {
   const _RapModeControls({
     required this.subMode,
     required this.fontSize,
+    required this.loop,
+    required this.onToggleLoop,
     required this.player,
     required this.virtualPlaying,
     required this.onToggleVirtualClock,
@@ -219,6 +313,8 @@ class _RapModeControls extends ConsumerWidget {
 
   final RapModeSubMode subMode;
   final double fontSize;
+  final bool loop;
+  final VoidCallback onToggleLoop;
   final AudioPlayer? player;
   final bool virtualPlaying;
   final VoidCallback onToggleVirtualClock;
@@ -238,6 +334,16 @@ class _RapModeControls extends ConsumerWidget {
                 onPressed: onExit,
               ),
               const Spacer(),
+              IconButton(
+                icon: Icon(
+                  Icons.repeat,
+                  color: loop ? Colors.deepPurpleAccent : Colors.white,
+                ),
+                tooltip: loop
+                    ? 'Loop on (tap to disable)'
+                    : 'Loop off (tap to enable)',
+                onPressed: onToggleLoop,
+              ),
               IconButton(
                 icon: const Icon(Icons.text_decrease, color: Colors.white),
                 onPressed: () =>

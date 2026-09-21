@@ -29,9 +29,7 @@ void main() {
     Ligne(id: 2, projetId: 1, texte: 'Second line', ordre: 1, timecodeMs: 5000),
   ];
 
-  testWidgets('renders lines read-only, without any editable field', (
-    tester,
-  ) async {
+  Future<void> pumpRapMode(WidgetTester tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -43,6 +41,23 @@ void main() {
       ),
     );
     await tester.pump();
+  }
+
+  AnimatedDefaultTextStyle styleOf(WidgetTester tester, String text) {
+    return tester.widget<AnimatedDefaultTextStyle>(
+      find
+          .ancestor(
+            of: find.text(text),
+            matching: find.byType(AnimatedDefaultTextStyle),
+          )
+          .first,
+    );
+  }
+
+  testWidgets('renders lines read-only, without any editable field', (
+    tester,
+  ) async {
+    await pumpRapMode(tester);
 
     expect(find.text('First line'), findsOneWidget);
     expect(find.text('Second line'), findsOneWidget);
@@ -52,42 +67,23 @@ void main() {
   testWidgets('font size controls change the rendered text size', (
     tester,
   ) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
-          lignesForProjetProvider(1)
-              .overrideWith((ref) => Stream.value(lignes)),
-        ],
-        child: const MaterialApp(home: RapModeScreen(projetId: 1)),
-      ),
-    );
-    await tester.pump();
+    await pumpRapMode(tester);
 
-    Text textWidget() => tester.widget<Text>(find.text('First line'));
-
-    final initialSize = textWidget().style!.fontSize!;
+    final initialSize = styleOf(tester, 'First line').style.fontSize!;
 
     await tester.tap(find.byIcon(Icons.text_increase));
     await tester.pump();
 
-    expect(textWidget().style!.fontSize, greaterThan(initialSize));
+    expect(
+      styleOf(tester, 'First line').style.fontSize,
+      greaterThan(initialSize),
+    );
   });
 
   testWidgets('tapping the sub-mode toggle switches auto and manual icons', (
     tester,
   ) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
-          lignesForProjetProvider(1)
-              .overrideWith((ref) => Stream.value(lignes)),
-        ],
-        child: const MaterialApp(home: RapModeScreen(projetId: 1)),
-      ),
-    );
-    await tester.pump();
+    await pumpRapMode(tester);
 
     expect(find.byIcon(Icons.sync), findsOneWidget);
     expect(find.byIcon(Icons.pan_tool_alt_outlined), findsNothing);
@@ -102,17 +98,7 @@ void main() {
   testWidgets(
     'without an audio file, a play button drives a timer-based clock',
     (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
-            lignesForProjetProvider(1)
-                .overrideWith((ref) => Stream.value(lignes)),
-          ],
-          child: const MaterialApp(home: RapModeScreen(projetId: 1)),
-        ),
-      );
-      await tester.pump();
+      await pumpRapMode(tester);
 
       expect(find.byIcon(Icons.play_arrow), findsOneWidget);
 
@@ -131,34 +117,67 @@ void main() {
   testWidgets(
     'the timer-based clock highlights the current line as it advances',
     (tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
-            lignesForProjetProvider(1)
-                .overrideWith((ref) => Stream.value(lignes)),
-          ],
-          child: const MaterialApp(home: RapModeScreen(projetId: 1)),
-        ),
-      );
-      await tester.pump();
+      await pumpRapMode(tester);
 
-      Color? colorOf(String text) =>
-          tester.widget<Text>(find.text(text)).style!.color;
-
-      expect(colorOf('First line'), Colors.white38);
-      expect(colorOf('Second line'), Colors.white38);
+      expect(styleOf(tester, 'First line').style.color, Colors.white38);
+      expect(styleOf(tester, 'Second line').style.color, Colors.white38);
 
       await tester.tap(find.byIcon(Icons.play_arrow));
       await tester.pump(const Duration(milliseconds: 200));
 
-      expect(colorOf('First line'), Colors.white);
-      expect(colorOf('Second line'), Colors.white38);
+      expect(styleOf(tester, 'First line').style.color, Colors.white);
+      expect(styleOf(tester, 'Second line').style.color, Colors.white38);
 
       await tester.pump(const Duration(seconds: 5));
 
-      expect(colorOf('First line'), Colors.white38);
-      expect(colorOf('Second line'), Colors.white);
+      expect(styleOf(tester, 'First line').style.color, Colors.white38);
+      expect(styleOf(tester, 'Second line').style.color, Colors.white);
+
+      // The clock already auto-paused on reaching the last timecode, so
+      // there's no running timer left to clean up here.
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+    },
+  );
+
+  testWidgets('tapping a line seeks the current line to its timecode', (
+    tester,
+  ) async {
+    await pumpRapMode(tester);
+
+    expect(styleOf(tester, 'First line').style.color, Colors.white38);
+
+    await tester.tap(find.text('Second line'));
+    await tester.pump();
+
+    expect(styleOf(tester, 'First line').style.color, Colors.white38);
+    expect(styleOf(tester, 'Second line').style.color, Colors.white);
+  });
+
+  testWidgets(
+    'the timer-based clock auto-pauses on the last line without looping',
+    (tester) async {
+      await pumpRapMode(tester);
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump(const Duration(seconds: 6));
+
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(styleOf(tester, 'Second line').style.color, Colors.white);
+    },
+  );
+
+  testWidgets(
+    'with looping enabled, the timer-based clock restarts instead of pausing',
+    (tester) async {
+      await pumpRapMode(tester);
+
+      await tester.tap(find.byIcon(Icons.repeat));
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump(const Duration(seconds: 6));
+
+      expect(find.byIcon(Icons.pause), findsOneWidget);
 
       await tester.tap(find.byIcon(Icons.pause));
       await tester.pump();

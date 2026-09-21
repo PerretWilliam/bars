@@ -37,3 +37,14 @@ final rapModeFontSizeProvider =
     NotifierProvider<RapModeFontSizeNotifier, double>(
       RapModeFontSizeNotifier.new,
     );
+
+class RapModeLoopNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void toggle() => state = !state;
+}
+
+final rapModeLoopProvider = NotifierProvider<RapModeLoopNotifier, bool>(
+  RapModeLoopNotifier.new,
+);
