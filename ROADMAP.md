@@ -55,8 +55,10 @@ Policy: no manual implementation if a library already does it.
 
 - [x] Light/dark theme via native `ThemeData`
 - [x] `flutter_lucide` (or equivalent) integration for a consistent icon set
-- [ ] General UI polish (spacing, visual consistency across screens)
+- [x] General UI polish: card redesign, folders, list/grid toggle, app info/legal/changelog/donate screens
 - [x] Local Android APK build for direct installation
 - [ ] iOS ad-hoc/personal team build via Xcode for installation on your own iPhone
-- [ ] If open source is chosen: create the public repo, write the README, pick a license
+- [x] Open source: public repo at [github.com/PerretWilliam/bars](https://github.com/PerretWilliam/bars), MIT `LICENSE`, `CONTRIBUTING.md`
 - [x] UI localization system (`flutter_localizations` + ARB), shipping English and French — see [CLAUDE.md](CLAUDE.md)'s Language conventions for how to add a string or a language
+- [x] Single-level folders for organizing projects (`Dossiers` table, `/folder/:id` route)
+- [x] Donate screen with manually-maintained Google Play / Apple Developer Program goal bars
