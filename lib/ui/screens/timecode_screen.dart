@@ -51,6 +51,69 @@ String _formatDuration(Duration d) {
   return '$minutes:$seconds';
 }
 
+/// Parses a `mm:ss` or plain-seconds string into milliseconds, or null if
+/// [input] isn't a valid non-negative timecode.
+int? _parseTimecode(String input) {
+  final parts = input.trim().split(':');
+  if (parts.isEmpty || parts.length > 2) return null;
+  final numbers = parts.map(int.tryParse).toList();
+  if (numbers.contains(null)) return null;
+  final seconds = parts.length == 2
+      ? numbers[0]! * 60 + numbers[1]!
+      : numbers[0]!;
+  if (seconds < 0) return null;
+  return seconds * 1000;
+}
+
+Future<void> _editTimecode(
+  BuildContext context,
+  WidgetRef ref,
+  int ligneId,
+  int? currentMs,
+) async {
+  final controller = TextEditingController(
+    text: currentMs == null
+        ? ''
+        : _formatDuration(Duration(milliseconds: currentMs)),
+  );
+  final result = await showDialog<String>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Set timecode'),
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        decoration: const InputDecoration(hintText: 'mm:ss'),
+      ),
+      actions: [
+        if (currentMs != null)
+          TextButton(
+            onPressed: () => Navigator.pop(context, ''),
+            child: const Text('Clear'),
+          ),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, controller.text),
+          child: const Text('Save'),
+        ),
+      ],
+    ),
+  );
+  if (result == null) return;
+
+  final controllerRef = ref.read(lignesControllerProvider);
+  if (result.isEmpty) {
+    await controllerRef.updateTimecode(ligneId, null);
+    return;
+  }
+  final ms = _parseTimecode(result);
+  if (ms == null) return;
+  await controllerRef.updateTimecode(ligneId, ms);
+}
+
 class _NoAudioView extends ConsumerStatefulWidget {
   const _NoAudioView({required this.projetId, required this.lignes});
 
@@ -62,16 +125,7 @@ class _NoAudioView extends ConsumerStatefulWidget {
 }
 
 class _NoAudioViewState extends ConsumerState<_NoAudioView> {
-  final _stopwatch = Stopwatch();
-  Timer? _ticker;
-  Duration _elapsed = Duration.zero;
   bool _importing = false;
-
-  @override
-  void dispose() {
-    _ticker?.cancel();
-    super.dispose();
-  }
 
   Future<void> _pickAndImport() async {
     final files = await FilePicker.pickFiles(type: FileType.audio);
@@ -87,26 +141,6 @@ class _NoAudioViewState extends ConsumerState<_NoAudioView> {
     } finally {
       if (mounted) setState(() => _importing = false);
     }
-  }
-
-  void _toggleStopwatch() {
-    setState(() {
-      if (_stopwatch.isRunning) {
-        _stopwatch.stop();
-        _ticker?.cancel();
-      } else {
-        _stopwatch.start();
-        _ticker = Timer.periodic(const Duration(milliseconds: 100), (_) {
-          setState(() => _elapsed = _stopwatch.elapsed);
-        });
-      }
-    });
-  }
-
-  void _markLine(int ligneId) {
-    ref
-        .read(lignesControllerProvider)
-        .updateTimecode(ligneId, _stopwatch.elapsed.inMilliseconds);
   }
 
   @override
@@ -130,29 +164,9 @@ class _NoAudioViewState extends ConsumerState<_NoAudioView> {
               ),
               const SizedBox(height: 8),
               Text(
-                'No audio yet — mark lines manually using the timer below.',
+                'No audio yet — tap a line below to set its timecode manually.',
                 style: Theme.of(context).textTheme.bodySmall,
                 textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _formatDuration(_elapsed),
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(width: 16),
-                  FilledButton.tonalIcon(
-                    onPressed: _toggleStopwatch,
-                    icon: Icon(
-                      _stopwatch.isRunning ? Icons.pause : Icons.play_arrow,
-                    ),
-                    label: Text(
-                      _stopwatch.isRunning ? 'Pause timer' : 'Start timer',
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
@@ -173,9 +187,10 @@ class _NoAudioViewState extends ConsumerState<_NoAudioView> {
                         ),
                       ),
                 trailing: IconButton(
-                  icon: const Icon(Icons.flag_outlined),
-                  tooltip: 'Mark at current time',
-                  onPressed: () => _markLine(ligne.id),
+                  icon: const Icon(Icons.edit_outlined),
+                  tooltip: 'Set timecode',
+                  onPressed: () =>
+                      _editTimecode(context, ref, ligne.id, ligne.timecodeMs),
                 ),
               );
             },
@@ -202,15 +217,11 @@ class _PlaybackSection extends ConsumerStatefulWidget {
 }
 
 class _PlaybackSectionState extends ConsumerState<_PlaybackSection> {
-  static const _itemExtent = 64.0;
-
   late final AudioPlayer _player;
   final _waveformExtractor = WaveformExtractor();
-  final _scrollController = ScrollController();
   StreamSubscription<Duration>? _positionSub;
   Waveform? _waveform;
   Duration _position = Duration.zero;
-  int _lastScrolledIndex = -1;
 
   @override
   void initState() {
@@ -233,38 +244,15 @@ class _PlaybackSectionState extends ConsumerState<_PlaybackSection> {
     _positionSub = _player.positionStream.listen((position) {
       if (!mounted) return;
       setState(() => _position = position);
-      _syncScroll(position);
     });
     final waveform = await _waveformExtractor.extract(widget.audio.cheminLocal);
     if (mounted) setState(() => _waveform = waveform);
-  }
-
-  void _syncScroll(Duration position) {
-    if (!_scrollController.hasClients) return;
-    final index = _currentLineIndex(position);
-    if (index == null || index == _lastScrolledIndex) return;
-    _lastScrolledIndex = index;
-    _scrollController.animateTo(
-      index * _itemExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
-  }
-
-  int? _currentLineIndex(Duration position) {
-    int? best;
-    for (var i = 0; i < widget.lignes.length; i++) {
-      final ms = widget.lignes[i].timecodeMs;
-      if (ms != null && ms <= position.inMilliseconds) best = i;
-    }
-    return best;
   }
 
   @override
   void dispose() {
     _positionSub?.cancel();
     _player.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -334,8 +322,6 @@ class _PlaybackSectionState extends ConsumerState<_PlaybackSection> {
         const Divider(height: 1),
         Expanded(
           child: ListView.builder(
-            controller: _scrollController,
-            itemExtent: _itemExtent,
             itemCount: widget.lignes.length,
             itemBuilder: (context, index) {
               final ligne = widget.lignes[index];
@@ -350,7 +336,7 @@ class _PlaybackSectionState extends ConsumerState<_PlaybackSection> {
                       ),
                 trailing: IconButton(
                   icon: const Icon(Icons.flag_outlined),
-                  tooltip: 'Mark at current time',
+                  tooltip: 'Mark at current playback time',
                   onPressed: () => _markLine(ligne.id),
                 ),
               );

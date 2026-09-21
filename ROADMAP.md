@@ -30,7 +30,7 @@ Policy: no manual implementation if a library already does it.
 - [x] `just_waveform` integration: waveform display to visually align timecodes (swapped for `audio_waveforms`, which has no macOS support — see commit history)
 - [x] Per-line timecode-setting UI ("mark this line at time T" during playback)
 - [x] Persist timecodes in the database, linked to each `Ligne`
-- [x] Lyrics scrolling synced to the current playback position
+- [ ] ~~Lyrics scrolling synced to the current playback position~~ → moved to Phase 5's auto-scroll sub-mode; not needed while setting timecodes
 - [x] Support timecodes without an audio file (manual placement of time markers)
 
 ## Phase 4 — Export and file management

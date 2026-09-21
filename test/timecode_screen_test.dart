@@ -23,6 +23,5 @@ void main() {
     await tester.pump();
 
     expect(find.text('Import audio file'), findsOneWidget);
-    expect(find.text('Start timer'), findsOneWidget);
   });
 }
