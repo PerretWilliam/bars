@@ -35,11 +35,11 @@ Policy: no manual implementation if a library already does it.
 
 ## Phase 4 — Export and file management
 
-- [ ] Serialize a full project to JSON (lines, timecodes, metadata)
-- [ ] `archive` integration: package into a `.rapproj` bundle (JSON + copied audio file)
-- [ ] Export the bundle via `file_picker` (choose destination folder)
-- [ ] Import a `.rapproj` bundle: deserialize and fully restore into the database
-- [ ] Clean project deletion, including cleanup of the associated audio file on disk
+- [x] Serialize a full project to JSON (lines, timecodes, metadata)
+- [x] `archive` integration: package into a `.rapproj` bundle (JSON + copied audio file)
+- [x] Export the bundle via `file_picker` (choose destination folder)
+- [x] Import a `.rapproj` bundle: deserialize and fully restore into the database
+- [x] Clean project deletion, including cleanup of the associated audio file on disk
 
 ## Phase 5 — Rap mode
 

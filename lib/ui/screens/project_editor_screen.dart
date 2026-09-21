@@ -11,6 +11,7 @@ import 'package:just_waveform/just_waveform.dart';
 import '../../data/app_database.dart';
 import '../../providers/audio_provider.dart';
 import '../../providers/lignes_provider.dart';
+import '../../providers/projets_provider.dart';
 import '../../services/language_detector.dart';
 import '../../services/waveform_extractor.dart';
 import '../widgets/rhyme_suggestions_panel.dart';
@@ -40,6 +41,13 @@ class ProjectEditorScreen extends ConsumerWidget {
     await ref.read(audioControllerProvider).importAudio(projetId, path);
   }
 
+  Future<void> _exportProject(WidgetRef ref) async {
+    final export = await ref
+        .read(projectBundleServiceProvider)
+        .exportProject(projetId);
+    await FilePicker.saveFile(fileName: export.fileName, bytes: export.bytes);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lignesAsync = ref.watch(lignesForProjetProvider(projetId));
@@ -50,6 +58,11 @@ class ProjectEditorScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Notepad'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.ios_share),
+            tooltip: 'Export project',
+            onPressed: () => _exportProject(ref),
+          ),
           IconButton(
             icon: const Icon(Icons.menu_book_outlined),
             tooltip: 'Rhyme dictionaries',
