@@ -79,31 +79,35 @@ class ProjectsListScreen extends ConsumerWidget {
             return const _EmptyState();
           }
           return ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: projets.length,
             itemBuilder: (context, index) {
               final projet = projets[index];
-              return Dismissible(
-                key: ValueKey(projet.id),
-                confirmDismiss: (direction) =>
-                    direction == DismissDirection.endToStart
-                    ? _confirmDelete(context, ref, projet)
-                    : _exportProject(context, ref, projet).then((_) => false),
-                background: Container(
-                  color: Colors.green,
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: const Icon(Icons.ios_share, color: Colors.white),
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
                 ),
-                secondaryBackground: Container(
-                  color: Colors.red,
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: const Icon(Icons.delete_outline, color: Colors.white),
-                ),
-                child: ListTile(
-                  title: Text(projet.nom),
-                  subtitle: Text(projet.langueParDefaut.toUpperCase()),
-                  onTap: () => context.push('/project/${projet.id}'),
+                child: Dismissible(
+                  key: ValueKey(projet.id),
+                  confirmDismiss: (direction) =>
+                      direction == DismissDirection.endToStart
+                      ? _confirmDelete(context, ref, projet)
+                      : _exportProject(context, ref, projet).then((_) => false),
+                  background: const _SwipeBackground(
+                    color: Colors.green,
+                    icon: Icons.ios_share,
+                    alignment: Alignment.centerLeft,
+                  ),
+                  secondaryBackground: const _SwipeBackground(
+                    color: Colors.red,
+                    icon: Icons.delete_outline,
+                    alignment: Alignment.centerRight,
+                  ),
+                  child: _ProjectCard(
+                    projet: projet,
+                    onTap: () => context.push('/project/${projet.id}'),
+                  ),
                 ),
               );
             },
@@ -173,6 +177,89 @@ class _NewProjectFabState extends State<_NewProjectFab> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SwipeBackground extends StatelessWidget {
+  const _SwipeBackground({
+    required this.color,
+    required this.icon,
+    required this.alignment,
+  });
+
+  final Color color;
+  final IconData icon;
+  final Alignment alignment;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      alignment: alignment,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Icon(icon, color: Colors.white),
+    );
+  }
+}
+
+class _ProjectCard extends StatelessWidget {
+  const _ProjectCard({required this.projet, required this.onTap});
+
+  final Projet projet;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final initial = projet.nom.trim().isEmpty
+        ? '?'
+        : projet.nom.trim()[0].toUpperCase();
+
+    return Card(
+      elevation: 0,
+      color: colorScheme.surfaceContainerHigh,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: CircleAvatar(
+          backgroundColor: colorScheme.primaryContainer,
+          foregroundColor: colorScheme.onPrimaryContainer,
+          child: Text(
+            initial,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: Text(
+          projet.nom,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Align(
+          alignment: Alignment.centerLeft,
+          child: Container(
+            margin: const EdgeInsets.only(top: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: colorScheme.secondaryContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              projet.langueParDefaut.toUpperCase(),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSecondaryContainer,
+              ),
+            ),
+          ),
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
+      ),
     );
   }
 }
