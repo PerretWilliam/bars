@@ -7,7 +7,7 @@ import 'package:lyrics/providers/lignes_provider.dart';
 import 'package:lyrics/ui/screens/project_editor_screen.dart';
 
 void main() {
-  testWidgets('the + button offers adding a line or importing audio', (
+  testWidgets('long-pressing the + FAB reveals the import-audio action', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -23,11 +23,11 @@ void main() {
     await tester.pump();
 
     expect(find.text('No lines yet. Tap + to start.'), findsOneWidget);
+    expect(find.byTooltip('Import audio file'), findsNothing);
 
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pumpAndSettle();
+    await tester.longPress(find.byIcon(Icons.add));
+    await tester.pump();
 
-    expect(find.text('Add line'), findsOneWidget);
-    expect(find.text('Import audio file'), findsOneWidget);
+    expect(find.byTooltip('Import audio file'), findsOneWidget);
   });
 }

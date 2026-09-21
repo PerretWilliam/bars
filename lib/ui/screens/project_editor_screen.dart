@@ -20,43 +20,23 @@ class ProjectEditorScreen extends ConsumerWidget {
 
   final int projetId;
 
-  Future<void> _showAddMenu(BuildContext context, WidgetRef ref) async {
-    final action = await showModalBottomSheet<String>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.add),
-              title: const Text('Add line'),
-              onTap: () => Navigator.pop(context, 'line'),
-            ),
-            ListTile(
-              leading: const Icon(Icons.audio_file_outlined),
-              title: const Text('Import audio file'),
-              onTap: () => Navigator.pop(context, 'audio'),
-            ),
-          ],
-        ),
-      ),
-    );
+  Future<void> _addLine(WidgetRef ref) async {
+    final lignes = await ref.read(lignesForProjetProvider(projetId).future);
+    await ref
+        .read(lignesControllerProvider)
+        .addLigne(projetId: projetId, ordre: lignes.length);
+  }
 
-    if (action == 'line') {
-      final lignes = await ref.read(lignesForProjetProvider(projetId).future);
-      await ref
-          .read(lignesControllerProvider)
-          .addLigne(projetId: projetId, ordre: lignes.length);
-    } else if (action == 'audio') {
-      final files = await FilePicker.pickFiles(type: FileType.audio);
-      if (files.isEmpty) return;
-      final path = files.single.path;
-      if (path == null) return;
-      if (context.mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Importing audio…')));
-      }
-      await ref.read(audioControllerProvider).importAudio(projetId, path);
+  Future<void> _importAudio(BuildContext context, WidgetRef ref) async {
+    final files = await FilePicker.pickFiles(type: FileType.audio);
+    if (files.isEmpty) return;
+    final path = files.single.path;
+    if (path == null) return;
+    if (context.mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Importing audio…')));
     }
+    await ref.read(audioControllerProvider).importAudio(projetId, path);
   }
 
   @override
@@ -119,10 +99,63 @@ class ProjectEditorScreen extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddMenu(context, ref),
-        child: const Icon(Icons.add),
+      floatingActionButton: _AddFab(
+        onAddLine: () => _addLine(ref),
+        onImportAudio: () => _importAudio(context, ref),
       ),
+    );
+  }
+}
+
+/// A `+` FAB that adds a line on a plain tap; long-pressing reveals a
+/// secondary mini-FAB for importing audio, Google Keep-style.
+class _AddFab extends StatefulWidget {
+  const _AddFab({required this.onAddLine, required this.onImportAudio});
+
+  final VoidCallback onAddLine;
+  final VoidCallback onImportAudio;
+
+  @override
+  State<_AddFab> createState() => _AddFabState();
+}
+
+class _AddFabState extends State<_AddFab> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        if (_expanded)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: FloatingActionButton.small(
+              heroTag: 'importAudioFab',
+              tooltip: 'Import audio file',
+              onPressed: () {
+                setState(() => _expanded = false);
+                widget.onImportAudio();
+              },
+              child: const Icon(Icons.audio_file_outlined),
+            ),
+          ),
+        GestureDetector(
+          onLongPress: () => setState(() => _expanded = !_expanded),
+          child: FloatingActionButton(
+            heroTag: 'addLineFab',
+            onPressed: () {
+              if (_expanded) {
+                setState(() => _expanded = false);
+              } else {
+                widget.onAddLine();
+              }
+            },
+            child: Icon(_expanded ? Icons.close : Icons.add),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -284,7 +317,9 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
   static const _detectionDebounce = Duration(milliseconds: 600);
 
   late final TextEditingController _textController;
+  late final TextEditingController _timecodeController;
   final _focusNode = FocusNode();
+  final _timecodeFocusNode = FocusNode();
   Timer? _debounce;
   bool _isFocused = false;
 
@@ -292,18 +327,36 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
   void initState() {
     super.initState();
     _textController = TextEditingController(text: widget.ligne.texte);
+    _timecodeController = TextEditingController(
+      text: _timecodeText(widget.ligne.timecodeMs),
+    );
     _focusNode.addListener(() {
       setState(() => _isFocused = _focusNode.hasFocus);
     });
   }
 
   @override
+  void didUpdateWidget(covariant _LigneTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Don't clobber what the user is actively typing.
+    if (!_timecodeFocusNode.hasFocus &&
+        oldWidget.ligne.timecodeMs != widget.ligne.timecodeMs) {
+      _timecodeController.text = _timecodeText(widget.ligne.timecodeMs);
+    }
+  }
+
+  @override
   void dispose() {
     _debounce?.cancel();
     _textController.dispose();
+    _timecodeController.dispose();
     _focusNode.dispose();
+    _timecodeFocusNode.dispose();
     super.dispose();
   }
+
+  static String _timecodeText(int? ms) =>
+      ms == null ? '' : _formatDuration(Duration(milliseconds: ms));
 
   void _onTexteChanged(String texte) {
     widget.onTexteChanged(texte);
@@ -332,59 +385,30 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
     setState(() {});
   }
 
-  Future<void> _editTimecode() async {
-    // Default to the live playback position when audio is loaded (one-tap
-    // "mark now"); otherwise default to the line's existing value for
-    // manual editing.
-    final prefillMs = widget.hasAudio
-        ? ref.read(audioPositionProvider).inMilliseconds
-        : widget.ligne.timecodeMs;
-
-    final fieldController = TextEditingController(
-      text: prefillMs == null
-          ? ''
-          : _formatDuration(Duration(milliseconds: prefillMs)),
-    );
-    final result = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Set timecode'),
-        content: TextField(
-          controller: fieldController,
-          autofocus: true,
-          decoration: const InputDecoration(hintText: 'mm:ss'),
-        ),
-        actions: [
-          if (widget.ligne.timecodeMs != null)
-            TextButton(
-              onPressed: () => Navigator.pop(context, ''),
-              child: const Text('Clear'),
-            ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, fieldController.text),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-    if (result == null) return;
-    if (result.isEmpty) {
+  void _commitTimecode(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) {
       widget.onTimecodeChanged(null);
       return;
     }
-    final ms = _parseTimecode(result);
-    if (ms == null) return;
+    final ms = _parseTimecode(trimmed);
+    if (ms == null) {
+      // Invalid input: revert to the last known-good value.
+      _timecodeController.text = _timecodeText(widget.ligne.timecodeMs);
+      return;
+    }
+    widget.onTimecodeChanged(ms);
+  }
+
+  void _markNow() {
+    final ms = ref.read(audioPositionProvider).inMilliseconds;
+    _timecodeController.text = _formatDuration(Duration(milliseconds: ms));
     widget.onTimecodeChanged(ms);
   }
 
   @override
   Widget build(BuildContext context) {
     final lastWord = _lastWord;
-    final timecodeMs = widget.ligne.timecodeMs;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -403,14 +427,30 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextButton(
-                onPressed: _editTimecode,
-                child: Text(
-                  timecodeMs == null
-                      ? '--:--'
-                      : _formatDuration(Duration(milliseconds: timecodeMs)),
+              SizedBox(
+                width: 56,
+                child: TextField(
+                  controller: _timecodeController,
+                  focusNode: _timecodeFocusNode,
+                  textAlign: TextAlign.center,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    hintText: '--:--',
+                    border: InputBorder.none,
+                    isDense: true,
+                  ),
+                  onSubmitted: _commitTimecode,
+                  onTapOutside: (_) =>
+                      _commitTimecode(_timecodeController.text),
                 ),
               ),
+              if (widget.hasAudio)
+                IconButton(
+                  icon: const Icon(Icons.flag_outlined, size: 20),
+                  tooltip: 'Mark at current playback time',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: _markNow,
+                ),
               IconButton(
                 icon: const Icon(Icons.delete_outline),
                 onPressed: widget.onDelete,
