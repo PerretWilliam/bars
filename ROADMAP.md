@@ -15,12 +15,12 @@ Policy: no manual implementation if a library already does it.
 
 ## Phase 2 — Notepad mode
 
-- [ ] Line editor via `ReorderableListView` (native): add, delete, reorder
-- [ ] `flutter_langdetect` integration: detect the language at the end of a line
-- [ ] Fetch and parse the Lexique dictionary (FR) → SQLite table indexed by word-ending sound
-- [ ] Fetch and parse the CMU Pronouncing Dictionary (EN) → same structure
-- [ ] `drift` query: find rhymes matching the current line's ending sound
-- [ ] Rhyme suggestions UI panel, with one-click insertion into the line
+- [x] Line editor via `ReorderableListView` (native): add, delete, reorder
+- [x] `flutter_langdetect` integration: detect the language at the end of a line
+- [x] Fetch and parse the Lexique dictionary (FR) → SQLite table indexed by word-ending sound
+- [x] Fetch and parse the CMU Pronouncing Dictionary (EN) → same structure
+- [x] `drift` query: find rhymes matching the current line's ending sound
+- [x] Rhyme suggestions UI panel, with one-click insertion into the line
 
 ## Phase 3 — Timecoded mode
 
