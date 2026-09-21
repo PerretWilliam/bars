@@ -66,6 +66,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createIndex(idxRhymesRimeKey);
       }
     },
+    // SQLite ignores declared `onDelete: KeyAction.cascade` foreign keys
+    // unless this pragma is set per-connection.
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
   );
 }
 
