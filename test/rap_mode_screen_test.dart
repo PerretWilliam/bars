@@ -98,4 +98,70 @@ void main() {
     expect(find.byIcon(Icons.sync), findsNothing);
     expect(find.byIcon(Icons.pan_tool_alt_outlined), findsOneWidget);
   });
+
+  testWidgets(
+    'without an audio file, a play button drives a timer-based clock',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
+            lignesForProjetProvider(1)
+                .overrideWith((ref) => Stream.value(lignes)),
+          ],
+          child: const MaterialApp(home: RapModeScreen(projetId: 1)),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.pause), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.pump();
+
+      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'the timer-based clock highlights the current line as it advances',
+    (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
+            lignesForProjetProvider(1)
+                .overrideWith((ref) => Stream.value(lignes)),
+          ],
+          child: const MaterialApp(home: RapModeScreen(projetId: 1)),
+        ),
+      );
+      await tester.pump();
+
+      Color? colorOf(String text) =>
+          tester.widget<Text>(find.text(text)).style!.color;
+
+      expect(colorOf('First line'), Colors.white38);
+      expect(colorOf('Second line'), Colors.white38);
+
+      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(colorOf('First line'), Colors.white);
+      expect(colorOf('Second line'), Colors.white38);
+
+      await tester.pump(const Duration(seconds: 5));
+
+      expect(colorOf('First line'), Colors.white38);
+      expect(colorOf('Second line'), Colors.white);
+
+      await tester.tap(find.byIcon(Icons.pause));
+      await tester.pump();
+    },
+  );
 }

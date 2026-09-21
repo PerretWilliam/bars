@@ -23,11 +23,17 @@ class RapModeScreen extends ConsumerStatefulWidget {
 
 class _RapModeScreenState extends ConsumerState<RapModeScreen> {
   final _itemScrollController = ItemScrollController();
+  final _itemPositionsListener = ItemPositionsListener.create();
   AudioPlayer? _player;
   StreamSubscription<Duration>? _positionSub;
   String? _loadedAudioPath;
   int? _lastScrolledIndex;
+  int? _currentLineIndex;
   bool _controlsVisible = true;
+
+  Timer? _virtualClockTimer;
+  Duration _virtualPosition = Duration.zero;
+  bool _virtualPlaying = false;
 
   @override
   void initState() {
@@ -40,9 +46,27 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
   void dispose() {
     _positionSub?.cancel();
     _player?.dispose();
+    _virtualClockTimer?.cancel();
     WakelockPlus.disable();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
+  }
+
+  /// Without an audio file, timecodes still exist (Phase 3 supports placing
+  /// them manually), so auto-scroll falls back to a plain elapsed-time
+  /// clock instead of a real playback position.
+  void _toggleVirtualClock() {
+    setState(() => _virtualPlaying = !_virtualPlaying);
+    if (_virtualPlaying) {
+      _virtualClockTimer = Timer.periodic(const Duration(milliseconds: 200), (
+        _,
+      ) {
+        _virtualPosition += const Duration(milliseconds: 200);
+        _onPosition(_virtualPosition);
+      });
+    } else {
+      _virtualClockTimer?.cancel();
+    }
   }
 
   Future<void> _ensurePlayerLoaded(Audio audio) async {
@@ -55,20 +79,34 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
   }
 
   void _onPosition(Duration position) {
+    if (!mounted) return;
     ref.read(audioPositionProvider.notifier).set(position);
-    if (ref.read(rapModeSubModeProvider) != RapModeSubMode.auto) return;
     final lignes = ref.read(lignesForProjetProvider(widget.projetId)).value;
     if (lignes == null) return;
     final index = _activeIndex(lignes, position.inMilliseconds);
+    if (index != -1 && index != _currentLineIndex) {
+      setState(() => _currentLineIndex = index);
+    }
+
+    if (ref.read(rapModeSubModeProvider) != RapModeSubMode.auto) return;
     if (index == -1 || index == _lastScrolledIndex) return;
     _lastScrolledIndex = index;
-    if (_itemScrollController.isAttached) {
-      _itemScrollController.scrollTo(
-        index: index,
-        duration: const Duration(milliseconds: 300),
-        alignment: 0.4,
-      );
-    }
+    if (!_itemScrollController.isAttached) return;
+    if (_isFullyVisible(index)) return;
+    _itemScrollController.scrollTo(
+      index: index,
+      duration: const Duration(milliseconds: 300),
+      alignment: 0.4,
+    );
+  }
+
+  /// Avoids animating a scroll when the target line is already fully on
+  /// screen (e.g. a short project where every line already fits).
+  bool _isFullyVisible(int index) {
+    return _itemPositionsListener.itemPositions.value.any(
+      (p) =>
+          p.index == index && p.itemLeadingEdge >= 0 && p.itemTrailingEdge <= 1,
+    );
   }
 
   int _activeIndex(List<Ligne> lignes, int positionMs) {
@@ -108,23 +146,31 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                       )
                     : ScrollablePositionedList.builder(
                         itemScrollController: _itemScrollController,
+                        itemPositionsListener: _itemPositionsListener,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 96,
                         ),
                         itemCount: lignes.length,
-                        itemBuilder: (context, index) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: Text(
-                            lignes[index].texte,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: fontSize,
-                              fontWeight: FontWeight.w500,
-                              height: 1.4,
+                        itemBuilder: (context, index) {
+                          final isCurrent = index == _currentLineIndex;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Text(
+                              lignes[index].texte,
+                              style: TextStyle(
+                                color: isCurrent
+                                    ? Colors.white
+                                    : Colors.white38,
+                                fontSize: fontSize,
+                                fontWeight: isCurrent
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                height: 1.4,
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stackTrace) => Center(
@@ -145,6 +191,8 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                     subMode: subMode,
                     fontSize: fontSize,
                     player: audio != null ? _player : null,
+                    virtualPlaying: _virtualPlaying,
+                    onToggleVirtualClock: _toggleVirtualClock,
                     onExit: () {
                       Navigator.of(context).pop();
                     },
@@ -164,12 +212,16 @@ class _RapModeControls extends ConsumerWidget {
     required this.subMode,
     required this.fontSize,
     required this.player,
+    required this.virtualPlaying,
+    required this.onToggleVirtualClock,
     required this.onExit,
   });
 
   final RapModeSubMode subMode;
   final double fontSize;
   final AudioPlayer? player;
+  final bool virtualPlaying;
+  final VoidCallback onToggleVirtualClock;
   final VoidCallback onExit;
 
   @override
@@ -212,21 +264,30 @@ class _RapModeControls extends ConsumerWidget {
             ],
           ),
         ),
-        if (player != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24),
-            child: StreamBuilder<bool>(
-              stream: player!.playingStream,
-              builder: (context, snapshot) {
-                final playing = snapshot.data ?? false;
-                return IconButton.filled(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 24),
+          child: player != null
+              ? StreamBuilder<bool>(
+                  stream: player!.playingStream,
+                  builder: (context, snapshot) {
+                    final playing = snapshot.data ?? false;
+                    return IconButton.filled(
+                      iconSize: 40,
+                      icon: Icon(playing ? Icons.pause : Icons.play_arrow),
+                      onPressed: () =>
+                          playing ? player!.pause() : player!.play(),
+                    );
+                  },
+                )
+              : IconButton.filled(
                   iconSize: 40,
-                  icon: Icon(playing ? Icons.pause : Icons.play_arrow),
-                  onPressed: () => playing ? player!.pause() : player!.play(),
-                );
-              },
-            ),
-          ),
+                  tooltip: virtualPlaying
+                      ? 'Pause the timer-based auto-scroll'
+                      : 'Start timer-based auto-scroll (no audio file)',
+                  icon: Icon(virtualPlaying ? Icons.pause : Icons.play_arrow),
+                  onPressed: onToggleVirtualClock,
+                ),
+        ),
       ],
     );
   }
