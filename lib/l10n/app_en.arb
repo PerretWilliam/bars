@@ -187,5 +187,111 @@
     "placeholders": {
       "error": {"type": "String"}
     }
-  }
+  },
+
+  "newFolderDialogTitle": "New folder",
+  "@newFolderDialogTitle": {"description": "Title of the dialog that creates a new folder, and the mini-FAB's tooltip"},
+
+  "folderNameLabel": "Folder name",
+  "@folderNameLabel": {"description": "Label for the folder name text field"},
+
+  "renameFolderDialogTitle": "Rename folder",
+  "@renameFolderDialogTitle": {"description": "Title of the dialog that renames a folder"},
+
+  "renameFolderTooltip": "Rename folder",
+  "@renameFolderTooltip": {"description": "Tooltip for the AppBar action that renames the current folder"},
+
+  "deleteFolderTooltip": "Delete folder",
+  "@deleteFolderTooltip": {"description": "Tooltip for the AppBar action that deletes the current folder"},
+
+  "deleteFolderDialogTitle": "Delete folder?",
+  "@deleteFolderDialogTitle": {"description": "Title of the confirmation dialog before deleting a folder"},
+
+  "deleteFolderDialogBody": "This deletes \"{folderName}\". Its projects move back to the main list — they aren't deleted.",
+  "@deleteFolderDialogBody": {
+    "description": "Body of the confirmation dialog before deleting a folder",
+    "placeholders": {
+      "folderName": {"type": "String"}
+    }
+  },
+
+  "folderLabel": "Folder",
+  "@folderLabel": {"description": "Label for the folder-picker dropdown on the project info screen"},
+
+  "noFolderOption": "None",
+  "@noFolderOption": {"description": "Option in the folder-picker dropdown meaning the project has no folder"},
+
+  "viewAsListTooltip": "View as list",
+  "@viewAsListTooltip": {"description": "Tooltip to switch the projects screen to list view"},
+
+  "viewAsGridTooltip": "View as grid",
+  "@viewAsGridTooltip": {"description": "Tooltip to switch the projects screen to grid view"},
+
+  "aboutTooltip": "About",
+  "@aboutTooltip": {"description": "Tooltip for the AppBar action that opens the About screen"},
+
+  "aboutTitle": "About",
+  "@aboutTitle": {"description": "AppBar title on the About screen"},
+
+  "appVersionLabel": "Version {version}",
+  "@appVersionLabel": {
+    "description": "Shows the app's version number",
+    "placeholders": {
+      "version": {"type": "String"}
+    }
+  },
+
+  "authorWebsiteTooltip": "Visit my website",
+  "@authorWebsiteTooltip": {"description": "Tooltip for the link to the author's personal website"},
+
+  "githubTooltip": "View on GitHub",
+  "@githubTooltip": {"description": "Tooltip for the link to the app's GitHub repository"},
+
+  "buyMeACoffeeTooltip": "Buy me a coffee",
+  "@buyMeACoffeeTooltip": {"description": "Tooltip for the link to the author's Buy Me a Coffee page"},
+
+  "legalMenuLabel": "Legal",
+  "@legalMenuLabel": {"description": "Menu entry on the About screen linking to the Legal screen"},
+
+  "changelogMenuLabel": "Changelog",
+  "@changelogMenuLabel": {"description": "Menu entry on the About screen linking to the Changelog screen"},
+
+  "donateMenuLabel": "Support this project",
+  "@donateMenuLabel": {"description": "Menu entry on the About screen linking to the Donate screen"},
+
+  "contributingMenuLabel": "Contributing",
+  "@contributingMenuLabel": {"description": "Menu entry on the About screen linking out to the CONTRIBUTING.md file on GitHub"},
+
+  "legalTitle": "Legal",
+  "@legalTitle": {"description": "AppBar title on the Legal screen"},
+
+  "legalPlaceholderText": "This section is a placeholder. It will be replaced with the app's actual privacy policy and terms of use before a public release.",
+  "@legalPlaceholderText": {"description": "Body text of the Legal screen, until real legal text is written"},
+
+  "changelogTitle": "Changelog",
+  "@changelogTitle": {"description": "AppBar title on the Changelog screen"},
+
+  "donateTitle": "Support this project",
+  "@donateTitle": {"description": "AppBar title on the Donate screen"},
+
+  "donateIntro": "This app has no ads and no subscription. If you'd like to help cover the cost of publishing it, here's where that goes:",
+  "@donateIntro": {"description": "Intro text on the Donate screen"},
+
+  "googleGoalLabel": "Google Play registration (one-time)",
+  "@googleGoalLabel": {"description": "Label for the Google Play donation goal"},
+
+  "appleGoalLabel": "Apple Developer Program (renews yearly)",
+  "@appleGoalLabel": {"description": "Label for the Apple Developer Program donation goal"},
+
+  "donateAmountLabel": "{raised} € / {goal} €",
+  "@donateAmountLabel": {
+    "description": "Shows progress toward a donation goal, e.g. \"12 € / 25 €\"",
+    "placeholders": {
+      "raised": {"type": "String"},
+      "goal": {"type": "String"}
+    }
+  },
+
+  "buyMeACoffeeButtonLabel": "Buy me a coffee",
+  "@buyMeACoffeeButtonLabel": {"description": "Button label linking to Buy Me a Coffee"}
 }

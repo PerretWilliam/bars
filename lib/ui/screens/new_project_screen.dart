@@ -11,7 +11,9 @@ Map<String, String> _availableLanguages(AppLocalizations l10n) => {
 };
 
 class NewProjectScreen extends ConsumerStatefulWidget {
-  const NewProjectScreen({super.key});
+  const NewProjectScreen({this.dossierId, super.key});
+
+  final int? dossierId;
 
   @override
   ConsumerState<NewProjectScreen> createState() => _NewProjectScreenState();
@@ -36,7 +38,11 @@ class _NewProjectScreenState extends ConsumerState<NewProjectScreen> {
     try {
       await ref
           .read(projetsControllerProvider)
-          .create(nom: _nameController.text.trim(), langue: _language);
+          .create(
+            nom: _nameController.text.trim(),
+            langue: _language,
+            dossierId: widget.dossierId,
+          );
       if (mounted) context.pop();
     } finally {
       if (mounted) setState(() => _isSubmitting = false);

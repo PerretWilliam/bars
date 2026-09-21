@@ -433,6 +433,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong: {error}'**
   String errorGenericMessage(String error);
+
+  /// Title of the dialog that creates a new folder, and the mini-FAB's tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'New folder'**
+  String get newFolderDialogTitle;
+
+  /// Label for the folder name text field
+  ///
+  /// In en, this message translates to:
+  /// **'Folder name'**
+  String get folderNameLabel;
+
+  /// Title of the dialog that renames a folder
+  ///
+  /// In en, this message translates to:
+  /// **'Rename folder'**
+  String get renameFolderDialogTitle;
+
+  /// Tooltip for the AppBar action that renames the current folder
+  ///
+  /// In en, this message translates to:
+  /// **'Rename folder'**
+  String get renameFolderTooltip;
+
+  /// Tooltip for the AppBar action that deletes the current folder
+  ///
+  /// In en, this message translates to:
+  /// **'Delete folder'**
+  String get deleteFolderTooltip;
+
+  /// Title of the confirmation dialog before deleting a folder
+  ///
+  /// In en, this message translates to:
+  /// **'Delete folder?'**
+  String get deleteFolderDialogTitle;
+
+  /// Body of the confirmation dialog before deleting a folder
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes \"{folderName}\". Its projects move back to the main list — they aren\'t deleted.'**
+  String deleteFolderDialogBody(String folderName);
+
+  /// Label for the folder-picker dropdown on the project info screen
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get folderLabel;
+
+  /// Option in the folder-picker dropdown meaning the project has no folder
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get noFolderOption;
+
+  /// Tooltip to switch the projects screen to list view
+  ///
+  /// In en, this message translates to:
+  /// **'View as list'**
+  String get viewAsListTooltip;
+
+  /// Tooltip to switch the projects screen to grid view
+  ///
+  /// In en, this message translates to:
+  /// **'View as grid'**
+  String get viewAsGridTooltip;
+
+  /// Tooltip for the AppBar action that opens the About screen
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutTooltip;
+
+  /// AppBar title on the About screen
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get aboutTitle;
+
+  /// Shows the app's version number
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String appVersionLabel(String version);
+
+  /// Tooltip for the link to the author's personal website
+  ///
+  /// In en, this message translates to:
+  /// **'Visit my website'**
+  String get authorWebsiteTooltip;
+
+  /// Tooltip for the link to the app's GitHub repository
+  ///
+  /// In en, this message translates to:
+  /// **'View on GitHub'**
+  String get githubTooltip;
+
+  /// Tooltip for the link to the author's Buy Me a Coffee page
+  ///
+  /// In en, this message translates to:
+  /// **'Buy me a coffee'**
+  String get buyMeACoffeeTooltip;
+
+  /// Menu entry on the About screen linking to the Legal screen
+  ///
+  /// In en, this message translates to:
+  /// **'Legal'**
+  String get legalMenuLabel;
+
+  /// Menu entry on the About screen linking to the Changelog screen
+  ///
+  /// In en, this message translates to:
+  /// **'Changelog'**
+  String get changelogMenuLabel;
+
+  /// Menu entry on the About screen linking to the Donate screen
+  ///
+  /// In en, this message translates to:
+  /// **'Support this project'**
+  String get donateMenuLabel;
+
+  /// Menu entry on the About screen linking out to the CONTRIBUTING.md file on GitHub
+  ///
+  /// In en, this message translates to:
+  /// **'Contributing'**
+  String get contributingMenuLabel;
+
+  /// AppBar title on the Legal screen
+  ///
+  /// In en, this message translates to:
+  /// **'Legal'**
+  String get legalTitle;
+
+  /// Body text of the Legal screen, until real legal text is written
+  ///
+  /// In en, this message translates to:
+  /// **'This section is a placeholder. It will be replaced with the app\'s actual privacy policy and terms of use before a public release.'**
+  String get legalPlaceholderText;
+
+  /// AppBar title on the Changelog screen
+  ///
+  /// In en, this message translates to:
+  /// **'Changelog'**
+  String get changelogTitle;
+
+  /// AppBar title on the Donate screen
+  ///
+  /// In en, this message translates to:
+  /// **'Support this project'**
+  String get donateTitle;
+
+  /// Intro text on the Donate screen
+  ///
+  /// In en, this message translates to:
+  /// **'This app has no ads and no subscription. If you\'d like to help cover the cost of publishing it, here\'s where that goes:'**
+  String get donateIntro;
+
+  /// Label for the Google Play donation goal
+  ///
+  /// In en, this message translates to:
+  /// **'Google Play registration (one-time)'**
+  String get googleGoalLabel;
+
+  /// Label for the Apple Developer Program donation goal
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Developer Program (renews yearly)'**
+  String get appleGoalLabel;
+
+  /// Shows progress toward a donation goal, e.g. "12 € / 25 €"
+  ///
+  /// In en, this message translates to:
+  /// **'{raised} € / {goal} €'**
+  String donateAmountLabel(String raised, String goal);
+
+  /// Button label linking to Buy Me a Coffee
+  ///
+  /// In en, this message translates to:
+  /// **'Buy me a coffee'**
+  String get buyMeACoffeeButtonLabel;
 }
 
 class _AppLocalizationsDelegate

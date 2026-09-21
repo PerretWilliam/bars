@@ -7,11 +7,6 @@ import '../data/app_database.dart';
 import '../services/project_bundle_service.dart';
 import 'database_provider.dart';
 
-final projetsListProvider = StreamProvider<List<Projet>>((ref) {
-  final db = ref.watch(databaseProvider);
-  return db.select(db.projets).watch();
-});
-
 final projetProvider = StreamProvider.family<Projet?, int>((ref, projetId) {
   final db = ref.watch(databaseProvider);
   return (db.select(
@@ -19,16 +14,49 @@ final projetProvider = StreamProvider.family<Projet?, int>((ref, projetId) {
   )..where((row) => row.id.equals(projetId))).watchSingleOrNull();
 });
 
+/// Projects belonging to [dossierId], or the root-level (folder-less)
+/// projects when [dossierId] is null.
+final projetsInDossierProvider = StreamProvider.family<List<Projet>, int?>((
+  ref,
+  dossierId,
+) {
+  final db = ref.watch(databaseProvider);
+  final query = db.select(db.projets);
+  if (dossierId == null) {
+    query.where((row) => row.dossierId.isNull());
+  } else {
+    query.where((row) => row.dossierId.equals(dossierId));
+  }
+  return query.watch();
+});
+
+/// Bumps a project's `updatedAt` to now. Called by any controller that
+/// mutates a project or something that belongs to it (lines, audio), so
+/// the project list can show a "last modified" date.
+Future<void> touchProjet(AppDatabase db, int projetId) {
+  return (db.update(db.projets)..where((row) => row.id.equals(projetId))).write(
+    ProjetsCompanion(updatedAt: Value(DateTime.now())),
+  );
+}
+
 class ProjetsController {
   ProjetsController(this._db);
 
   final AppDatabase _db;
 
-  Future<void> create({required String nom, required String langue}) {
+  Future<void> create({
+    required String nom,
+    required String langue,
+    int? dossierId,
+  }) {
     return _db
         .into(_db.projets)
         .insert(
-          ProjetsCompanion.insert(nom: nom, langueParDefaut: Value(langue)),
+          ProjetsCompanion.insert(
+            nom: nom,
+            langueParDefaut: Value(langue),
+            dossierId: Value(dossierId),
+          ),
         );
   }
 
@@ -37,12 +65,15 @@ class ProjetsController {
     required String nom,
     required String langue,
     String? lienProd,
+    int? dossierId,
   }) {
     return (_db.update(_db.projets)..where((row) => row.id.equals(id))).write(
       ProjetsCompanion(
         nom: Value(nom),
         langueParDefaut: Value(langue),
         lienProd: Value(lienProd),
+        dossierId: Value(dossierId),
+        updatedAt: Value(DateTime.now()),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:just_audio/just_audio.dart';
 import '../data/app_database.dart';
 import '../services/audio_file_manager.dart';
 import 'database_provider.dart';
+import 'projets_provider.dart';
 
 /// The current playback position of whichever audio is loaded in the
 /// Notepad screen. Read on-demand (not watched) so per-line "mark now"
@@ -62,12 +63,14 @@ class AudioController {
             ),
           );
     });
+    await touchProjet(_db, projetId);
   }
 
-  Future<void> removeAudio(int projetId) {
-    return (_db.delete(
+  Future<void> removeAudio(int projetId) async {
+    await (_db.delete(
       _db.audios,
     )..where((a) => a.projetId.equals(projetId))).go();
+    await touchProjet(_db, projetId);
   }
 }
 

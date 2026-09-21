@@ -187,4 +187,102 @@ class AppLocalizationsEn extends AppLocalizations {
   String errorGenericMessage(String error) {
     return 'Something went wrong: $error';
   }
+
+  @override
+  String get newFolderDialogTitle => 'New folder';
+
+  @override
+  String get folderNameLabel => 'Folder name';
+
+  @override
+  String get renameFolderDialogTitle => 'Rename folder';
+
+  @override
+  String get renameFolderTooltip => 'Rename folder';
+
+  @override
+  String get deleteFolderTooltip => 'Delete folder';
+
+  @override
+  String get deleteFolderDialogTitle => 'Delete folder?';
+
+  @override
+  String deleteFolderDialogBody(String folderName) {
+    return 'This deletes \"$folderName\". Its projects move back to the main list — they aren\'t deleted.';
+  }
+
+  @override
+  String get folderLabel => 'Folder';
+
+  @override
+  String get noFolderOption => 'None';
+
+  @override
+  String get viewAsListTooltip => 'View as list';
+
+  @override
+  String get viewAsGridTooltip => 'View as grid';
+
+  @override
+  String get aboutTooltip => 'About';
+
+  @override
+  String get aboutTitle => 'About';
+
+  @override
+  String appVersionLabel(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get authorWebsiteTooltip => 'Visit my website';
+
+  @override
+  String get githubTooltip => 'View on GitHub';
+
+  @override
+  String get buyMeACoffeeTooltip => 'Buy me a coffee';
+
+  @override
+  String get legalMenuLabel => 'Legal';
+
+  @override
+  String get changelogMenuLabel => 'Changelog';
+
+  @override
+  String get donateMenuLabel => 'Support this project';
+
+  @override
+  String get contributingMenuLabel => 'Contributing';
+
+  @override
+  String get legalTitle => 'Legal';
+
+  @override
+  String get legalPlaceholderText =>
+      'This section is a placeholder. It will be replaced with the app\'s actual privacy policy and terms of use before a public release.';
+
+  @override
+  String get changelogTitle => 'Changelog';
+
+  @override
+  String get donateTitle => 'Support this project';
+
+  @override
+  String get donateIntro =>
+      'This app has no ads and no subscription. If you\'d like to help cover the cost of publishing it, here\'s where that goes:';
+
+  @override
+  String get googleGoalLabel => 'Google Play registration (one-time)';
+
+  @override
+  String get appleGoalLabel => 'Apple Developer Program (renews yearly)';
+
+  @override
+  String donateAmountLabel(String raised, String goal) {
+    return '$raised € / $goal €';
+  }
+
+  @override
+  String get buyMeACoffeeButtonLabel => 'Buy me a coffee';
 }

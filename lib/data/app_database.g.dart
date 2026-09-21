@@ -3,6 +3,247 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
+class $DossiersTable extends Dossiers with TableInfo<$DossiersTable, Dossier> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DossiersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nomMeta = const VerificationMeta('nom');
+  @override
+  late final GeneratedColumn<String> nom = GeneratedColumn<String>(
+    'nom',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, nom, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'dossiers';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Dossier> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('nom')) {
+      context.handle(
+        _nomMeta,
+        nom.isAcceptableOrUnknown(data['nom']!, _nomMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nomMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Dossier map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Dossier(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      nom: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nom'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DossiersTable createAlias(String alias) {
+    return $DossiersTable(attachedDatabase, alias);
+  }
+}
+
+class Dossier extends DataClass implements Insertable<Dossier> {
+  final int id;
+  final String nom;
+  final DateTime createdAt;
+  const Dossier({required this.id, required this.nom, required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['nom'] = Variable<String>(nom);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  DossiersCompanion toCompanion(bool nullToAbsent) {
+    return DossiersCompanion(
+      id: Value(id),
+      nom: Value(nom),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Dossier.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Dossier(
+      id: serializer.fromJson<int>(json['id']),
+      nom: serializer.fromJson<String>(json['nom']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'nom': serializer.toJson<String>(nom),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Dossier copyWith({int? id, String? nom, DateTime? createdAt}) => Dossier(
+    id: id ?? this.id,
+    nom: nom ?? this.nom,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Dossier copyWithCompanion(DossiersCompanion data) {
+    return Dossier(
+      id: data.id.present ? data.id.value : this.id,
+      nom: data.nom.present ? data.nom.value : this.nom,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Dossier(')
+          ..write('id: $id, ')
+          ..write('nom: $nom, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, nom, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Dossier &&
+          other.id == this.id &&
+          other.nom == this.nom &&
+          other.createdAt == this.createdAt);
+}
+
+class DossiersCompanion extends UpdateCompanion<Dossier> {
+  final Value<int> id;
+  final Value<String> nom;
+  final Value<DateTime> createdAt;
+  const DossiersCompanion({
+    this.id = const Value.absent(),
+    this.nom = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  DossiersCompanion.insert({
+    this.id = const Value.absent(),
+    required String nom,
+    this.createdAt = const Value.absent(),
+  }) : nom = Value(nom);
+  static Insertable<Dossier> custom({
+    Expression<int>? id,
+    Expression<String>? nom,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (nom != null) 'nom': nom,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  DossiersCompanion copyWith({
+    Value<int>? id,
+    Value<String>? nom,
+    Value<DateTime>? createdAt,
+  }) {
+    return DossiersCompanion(
+      id: id ?? this.id,
+      nom: nom ?? this.nom,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (nom.present) {
+      map['nom'] = Variable<String>(nom.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DossiersCompanion(')
+          ..write('id: $id, ')
+          ..write('nom: $nom, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $ProjetsTable extends Projets with TableInfo<$ProjetsTable, Projet> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -54,6 +295,18 @@ class $ProjetsTable extends Projets with TableInfo<$ProjetsTable, Projet> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
   static const VerificationMeta _lienProdMeta = const VerificationMeta(
     'lienProd',
   );
@@ -65,13 +318,29 @@ class $ProjetsTable extends Projets with TableInfo<$ProjetsTable, Projet> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _dossierIdMeta = const VerificationMeta(
+    'dossierId',
+  );
+  @override
+  late final GeneratedColumn<int> dossierId = GeneratedColumn<int>(
+    'dossier_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES dossiers (id) ON DELETE SET NULL',
+    ),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
     nom,
     langueParDefaut,
     createdAt,
+    updatedAt,
     lienProd,
+    dossierId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -111,10 +380,22 @@ class $ProjetsTable extends Projets with TableInfo<$ProjetsTable, Projet> {
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
     if (data.containsKey('lien_prod')) {
       context.handle(
         _lienProdMeta,
         lienProd.isAcceptableOrUnknown(data['lien_prod']!, _lienProdMeta),
+      );
+    }
+    if (data.containsKey('dossier_id')) {
+      context.handle(
+        _dossierIdMeta,
+        dossierId.isAcceptableOrUnknown(data['dossier_id']!, _dossierIdMeta),
       );
     }
     return context;
@@ -142,9 +423,17 @@ class $ProjetsTable extends Projets with TableInfo<$ProjetsTable, Projet> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
       lienProd: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}lien_prod'],
+      ),
+      dossierId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}dossier_id'],
       ),
     );
   }
@@ -160,13 +449,17 @@ class Projet extends DataClass implements Insertable<Projet> {
   final String nom;
   final String langueParDefaut;
   final DateTime createdAt;
+  final DateTime updatedAt;
   final String? lienProd;
+  final int? dossierId;
   const Projet({
     required this.id,
     required this.nom,
     required this.langueParDefaut,
     required this.createdAt,
+    required this.updatedAt,
     this.lienProd,
+    this.dossierId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -175,8 +468,12 @@ class Projet extends DataClass implements Insertable<Projet> {
     map['nom'] = Variable<String>(nom);
     map['langue_par_defaut'] = Variable<String>(langueParDefaut);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
     if (!nullToAbsent || lienProd != null) {
       map['lien_prod'] = Variable<String>(lienProd);
+    }
+    if (!nullToAbsent || dossierId != null) {
+      map['dossier_id'] = Variable<int>(dossierId);
     }
     return map;
   }
@@ -187,9 +484,13 @@ class Projet extends DataClass implements Insertable<Projet> {
       nom: Value(nom),
       langueParDefaut: Value(langueParDefaut),
       createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
       lienProd: lienProd == null && nullToAbsent
           ? const Value.absent()
           : Value(lienProd),
+      dossierId: dossierId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dossierId),
     );
   }
 
@@ -203,7 +504,9 @@ class Projet extends DataClass implements Insertable<Projet> {
       nom: serializer.fromJson<String>(json['nom']),
       langueParDefaut: serializer.fromJson<String>(json['langueParDefaut']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       lienProd: serializer.fromJson<String?>(json['lienProd']),
+      dossierId: serializer.fromJson<int?>(json['dossierId']),
     );
   }
   @override
@@ -214,7 +517,9 @@ class Projet extends DataClass implements Insertable<Projet> {
       'nom': serializer.toJson<String>(nom),
       'langueParDefaut': serializer.toJson<String>(langueParDefaut),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'lienProd': serializer.toJson<String?>(lienProd),
+      'dossierId': serializer.toJson<int?>(dossierId),
     };
   }
 
@@ -223,13 +528,17 @@ class Projet extends DataClass implements Insertable<Projet> {
     String? nom,
     String? langueParDefaut,
     DateTime? createdAt,
+    DateTime? updatedAt,
     Value<String?> lienProd = const Value.absent(),
+    Value<int?> dossierId = const Value.absent(),
   }) => Projet(
     id: id ?? this.id,
     nom: nom ?? this.nom,
     langueParDefaut: langueParDefaut ?? this.langueParDefaut,
     createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
     lienProd: lienProd.present ? lienProd.value : this.lienProd,
+    dossierId: dossierId.present ? dossierId.value : this.dossierId,
   );
   Projet copyWithCompanion(ProjetsCompanion data) {
     return Projet(
@@ -239,7 +548,9 @@ class Projet extends DataClass implements Insertable<Projet> {
           ? data.langueParDefaut.value
           : this.langueParDefaut,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       lienProd: data.lienProd.present ? data.lienProd.value : this.lienProd,
+      dossierId: data.dossierId.present ? data.dossierId.value : this.dossierId,
     );
   }
 
@@ -250,14 +561,23 @@ class Projet extends DataClass implements Insertable<Projet> {
           ..write('nom: $nom, ')
           ..write('langueParDefaut: $langueParDefaut, ')
           ..write('createdAt: $createdAt, ')
-          ..write('lienProd: $lienProd')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lienProd: $lienProd, ')
+          ..write('dossierId: $dossierId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, nom, langueParDefaut, createdAt, lienProd);
+  int get hashCode => Object.hash(
+    id,
+    nom,
+    langueParDefaut,
+    createdAt,
+    updatedAt,
+    lienProd,
+    dossierId,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -266,7 +586,9 @@ class Projet extends DataClass implements Insertable<Projet> {
           other.nom == this.nom &&
           other.langueParDefaut == this.langueParDefaut &&
           other.createdAt == this.createdAt &&
-          other.lienProd == this.lienProd);
+          other.updatedAt == this.updatedAt &&
+          other.lienProd == this.lienProd &&
+          other.dossierId == this.dossierId);
 }
 
 class ProjetsCompanion extends UpdateCompanion<Projet> {
@@ -274,34 +596,44 @@ class ProjetsCompanion extends UpdateCompanion<Projet> {
   final Value<String> nom;
   final Value<String> langueParDefaut;
   final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
   final Value<String?> lienProd;
+  final Value<int?> dossierId;
   const ProjetsCompanion({
     this.id = const Value.absent(),
     this.nom = const Value.absent(),
     this.langueParDefaut = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.lienProd = const Value.absent(),
+    this.dossierId = const Value.absent(),
   });
   ProjetsCompanion.insert({
     this.id = const Value.absent(),
     required String nom,
     this.langueParDefaut = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.lienProd = const Value.absent(),
+    this.dossierId = const Value.absent(),
   }) : nom = Value(nom);
   static Insertable<Projet> custom({
     Expression<int>? id,
     Expression<String>? nom,
     Expression<String>? langueParDefaut,
     Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
     Expression<String>? lienProd,
+    Expression<int>? dossierId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (nom != null) 'nom': nom,
       if (langueParDefaut != null) 'langue_par_defaut': langueParDefaut,
       if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
       if (lienProd != null) 'lien_prod': lienProd,
+      if (dossierId != null) 'dossier_id': dossierId,
     });
   }
 
@@ -310,14 +642,18 @@ class ProjetsCompanion extends UpdateCompanion<Projet> {
     Value<String>? nom,
     Value<String>? langueParDefaut,
     Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
     Value<String?>? lienProd,
+    Value<int?>? dossierId,
   }) {
     return ProjetsCompanion(
       id: id ?? this.id,
       nom: nom ?? this.nom,
       langueParDefaut: langueParDefaut ?? this.langueParDefaut,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
       lienProd: lienProd ?? this.lienProd,
+      dossierId: dossierId ?? this.dossierId,
     );
   }
 
@@ -336,8 +672,14 @@ class ProjetsCompanion extends UpdateCompanion<Projet> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
     if (lienProd.present) {
       map['lien_prod'] = Variable<String>(lienProd.value);
+    }
+    if (dossierId.present) {
+      map['dossier_id'] = Variable<int>(dossierId.value);
     }
     return map;
   }
@@ -349,7 +691,9 @@ class ProjetsCompanion extends UpdateCompanion<Projet> {
           ..write('nom: $nom, ')
           ..write('langueParDefaut: $langueParDefaut, ')
           ..write('createdAt: $createdAt, ')
-          ..write('lienProd: $lienProd')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('lienProd: $lienProd, ')
+          ..write('dossierId: $dossierId')
           ..write(')'))
         .toString();
   }
@@ -1365,6 +1709,7 @@ class RhymesCompanion extends UpdateCompanion<Rhyme> {
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
+  late final $DossiersTable dossiers = $DossiersTable(this);
   late final $ProjetsTable projets = $ProjetsTable(this);
   late final $LignesTable lignes = $LignesTable(this);
   late final $AudiosTable audios = $AudiosTable(this);
@@ -1382,6 +1727,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
+    dossiers,
     projets,
     lignes,
     audios,
@@ -1391,6 +1737,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'dossiers',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('projets', kind: UpdateKind.update)],
+    ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'projets',
@@ -1408,24 +1761,288 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   ]);
 }
 
+typedef $$DossiersTableCreateCompanionBuilder = DossiersCompanion Function({
+  Value<int> id,
+  required String nom,
+  Value<DateTime> createdAt,
+});
+typedef $$DossiersTableUpdateCompanionBuilder = DossiersCompanion Function({
+  Value<int> id,
+  Value<String> nom,
+  Value<DateTime> createdAt,
+});
+
+final class $$DossiersTableReferences
+    extends BaseReferences<_$AppDatabase, $DossiersTable, Dossier> {
+  $$DossiersTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$ProjetsTable, List<Projet>> _projetsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.projets,
+    aliasName: 'dossiers__id__projets__dossier_id',
+  );
+
+  $$ProjetsTableProcessedTableManager get projetsRefs {
+    final manager = $$ProjetsTableTableManager(
+      $_db,
+      $_db.projets,
+    ).filter((f) => f.dossierId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_projetsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$DossiersTableFilterComposer
+    extends Composer<_$AppDatabase, $DossiersTable> {
+  $$DossiersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nom => $composableBuilder(
+    column: $table.nom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> projetsRefs(
+    Expression<bool> Function($$ProjetsTableFilterComposer f) f,
+  ) {
+    final $$ProjetsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.projets,
+      getReferencedColumn: (t) => t.dossierId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjetsTableFilterComposer(
+            $db: $db,
+            $table: $db.projets,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$DossiersTableOrderingComposer
+    extends Composer<_$AppDatabase, $DossiersTable> {
+  $$DossiersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nom => $composableBuilder(
+    column: $table.nom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DossiersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DossiersTable> {
+  $$DossiersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get nom =>
+      $composableBuilder(column: $table.nom, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  Expression<T> projetsRefs<T extends Object>(
+    Expression<T> Function($$ProjetsTableAnnotationComposer a) f,
+  ) {
+    final $$ProjetsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.projets,
+      getReferencedColumn: (t) => t.dossierId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProjetsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.projets,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$DossiersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DossiersTable,
+          Dossier,
+          $$DossiersTableFilterComposer,
+          $$DossiersTableOrderingComposer,
+          $$DossiersTableAnnotationComposer,
+          $$DossiersTableCreateCompanionBuilder,
+          $$DossiersTableUpdateCompanionBuilder,
+          (Dossier, $$DossiersTableReferences),
+          Dossier,
+          PrefetchHooks Function({bool projetsRefs})
+        > {
+  $$DossiersTableTableManager(_$AppDatabase db, $DossiersTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DossiersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DossiersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DossiersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> nom = const Value.absent(),
+            Value<DateTime> createdAt = const Value.absent(),
+          }) => DossiersCompanion(id: id, nom: nom, createdAt: createdAt),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String nom,
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => DossiersCompanion.insert(
+                id: id,
+                nom: nom,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DossiersTable, Dossier>(table),
+                  $$DossiersTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({projetsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (projetsRefs) db.projets],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (projetsRefs)
+                    await $_getPrefetchedData<Dossier, $DossiersTable, Projet>(
+                      currentTable: table,
+                      referencedTable: $$DossiersTableReferences
+                          ._projetsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$DossiersTableReferences(db, table, p0).projetsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.dossierId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$DossiersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DossiersTable,
+      Dossier,
+      $$DossiersTableFilterComposer,
+      $$DossiersTableOrderingComposer,
+      $$DossiersTableAnnotationComposer,
+      $$DossiersTableCreateCompanionBuilder,
+      $$DossiersTableUpdateCompanionBuilder,
+      (Dossier, $$DossiersTableReferences),
+      Dossier,
+      PrefetchHooks Function({bool projetsRefs})
+    >;
 typedef $$ProjetsTableCreateCompanionBuilder = ProjetsCompanion Function({
   Value<int> id,
   required String nom,
   Value<String> langueParDefaut,
   Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<String?> lienProd,
+  Value<int?> dossierId,
 });
 typedef $$ProjetsTableUpdateCompanionBuilder = ProjetsCompanion Function({
   Value<int> id,
   Value<String> nom,
   Value<String> langueParDefaut,
   Value<DateTime> createdAt,
+  Value<DateTime> updatedAt,
   Value<String?> lienProd,
+  Value<int?> dossierId,
 });
 
 final class $$ProjetsTableReferences
     extends BaseReferences<_$AppDatabase, $ProjetsTable, Projet> {
   $$ProjetsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $DossiersTable _dossierIdTable(_$AppDatabase db) =>
+      db.dossiers.createAlias('projets__dossier_id__dossiers__id');
+
+  $$DossiersTableProcessedTableManager? get dossierId {
+    final $_column = $_itemColumn<int>('dossier_id');
+    if ($_column == null) return null;
+    final manager = $$DossiersTableTableManager(
+      $_db,
+      $_db.dossiers,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_dossierIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
 
   static MultiTypedResultKey<$LignesTable, List<Ligne>> _lignesRefsTable(
     _$AppDatabase db,
@@ -1495,10 +2112,38 @@ class $$ProjetsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get lienProd => $composableBuilder(
     column: $table.lienProd,
     builder: (column) => ColumnFilters(column),
   );
+
+  $$DossiersTableFilterComposer get dossierId {
+    final $$DossiersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.dossierId,
+      referencedTable: $db.dossiers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DossiersTableFilterComposer(
+            $db: $db,
+            $table: $db.dossiers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
   Expression<bool> lignesRefs(
     Expression<bool> Function($$LignesTableFilterComposer f) f,
@@ -1580,10 +2225,38 @@ class $$ProjetsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get lienProd => $composableBuilder(
     column: $table.lienProd,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$DossiersTableOrderingComposer get dossierId {
+    final $$DossiersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.dossierId,
+      referencedTable: $db.dossiers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DossiersTableOrderingComposer(
+            $db: $db,
+            $table: $db.dossiers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$ProjetsTableAnnotationComposer
@@ -1609,8 +2282,34 @@ class $$ProjetsTableAnnotationComposer
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
   GeneratedColumn<String> get lienProd =>
       $composableBuilder(column: $table.lienProd, builder: (column) => column);
+
+  $$DossiersTableAnnotationComposer get dossierId {
+    final $$DossiersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.dossierId,
+      referencedTable: $db.dossiers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DossiersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.dossiers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
   Expression<T> lignesRefs<T extends Object>(
     Expression<T> Function($$LignesTableAnnotationComposer a) f,
@@ -1676,7 +2375,11 @@ class $$ProjetsTableTableManager
           $$ProjetsTableUpdateCompanionBuilder,
           (Projet, $$ProjetsTableReferences),
           Projet,
-          PrefetchHooks Function({bool lignesRefs, bool audiosRefs})
+          PrefetchHooks Function({
+            bool dossierId,
+            bool lignesRefs,
+            bool audiosRefs,
+          })
         > {
   $$ProjetsTableTableManager(_$AppDatabase db, $ProjetsTable table)
     : super(
@@ -1695,13 +2398,17 @@ class $$ProjetsTableTableManager
                 Value<String> nom = const Value.absent(),
                 Value<String> langueParDefaut = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
                 Value<String?> lienProd = const Value.absent(),
+                Value<int?> dossierId = const Value.absent(),
               }) => ProjetsCompanion(
                 id: id,
                 nom: nom,
                 langueParDefaut: langueParDefaut,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
                 lienProd: lienProd,
+                dossierId: dossierId,
               ),
           createCompanionCallback:
               ({
@@ -1709,13 +2416,17 @@ class $$ProjetsTableTableManager
                 required String nom,
                 Value<String> langueParDefaut = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
                 Value<String?> lienProd = const Value.absent(),
+                Value<int?> dossierId = const Value.absent(),
               }) => ProjetsCompanion.insert(
                 id: id,
                 nom: nom,
                 langueParDefaut: langueParDefaut,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
                 lienProd: lienProd,
+                dossierId: dossierId,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -1725,42 +2436,84 @@ class $$ProjetsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({lignesRefs = false, audiosRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (lignesRefs) db.lignes,
-                if (audiosRefs) db.audios,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (lignesRefs)
-                    await $_getPrefetchedData<Projet, $ProjetsTable, Ligne>(
-                      currentTable: table,
-                      referencedTable: $$ProjetsTableReferences
-                          ._lignesRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$ProjetsTableReferences(db, table, p0).lignesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.projetId == item.id),
-                      typedResults: items,
-                    ),
-                  if (audiosRefs)
-                    await $_getPrefetchedData<Projet, $ProjetsTable, Audio>(
-                      currentTable: table,
-                      referencedTable: $$ProjetsTableReferences
-                          ._audiosRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$ProjetsTableReferences(db, table, p0).audiosRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.projetId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({dossierId = false, lignesRefs = false, audiosRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (lignesRefs) db.lignes,
+                    if (audiosRefs) db.audios,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (dossierId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.dossierId,
+                            referencedTable: $$ProjetsTableReferences
+                                ._dossierIdTable(db),
+                            referencedColumn: $$ProjetsTableReferences
+                                ._dossierIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (lignesRefs)
+                        await $_getPrefetchedData<Projet, $ProjetsTable, Ligne>(
+                          currentTable: table,
+                          referencedTable: $$ProjetsTableReferences
+                              ._lignesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProjetsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).lignesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.projetId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (audiosRefs)
+                        await $_getPrefetchedData<Projet, $ProjetsTable, Audio>(
+                          currentTable: table,
+                          referencedTable: $$ProjetsTableReferences
+                              ._audiosRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProjetsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).audiosRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.projetId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -1777,7 +2530,7 @@ typedef $$ProjetsTableProcessedTableManager =
       $$ProjetsTableUpdateCompanionBuilder,
       (Projet, $$ProjetsTableReferences),
       Projet,
-      PrefetchHooks Function({bool lignesRefs, bool audiosRefs})
+      PrefetchHooks Function({bool dossierId, bool lignesRefs, bool audiosRefs})
     >;
 typedef $$LignesTableCreateCompanionBuilder = LignesCompanion Function({
   Value<int> id,
@@ -2581,6 +3334,8 @@ typedef $$RhymesTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
+  $$DossiersTableTableManager get dossiers =>
+      $$DossiersTableTableManager(_db, _db.dossiers);
   $$ProjetsTableTableManager get projets =>
       $$ProjetsTableTableManager(_db, _db.projets);
   $$LignesTableTableManager get lignes =>

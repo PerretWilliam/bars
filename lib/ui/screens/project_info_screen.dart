@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../providers/dossiers_provider.dart';
 import '../../providers/projets_provider.dart';
 
 Map<String, String> _availableLanguages(AppLocalizations l10n) => {
@@ -26,6 +27,7 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
   final _nameController = TextEditingController();
   final _prodLinkController = TextEditingController();
   String? _language;
+  int? _dossierId;
   bool _isSubmitting = false;
   bool _initialized = false;
 
@@ -49,6 +51,7 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
             nom: _nameController.text.trim(),
             langue: _language!,
             lienProd: lienProd.isEmpty ? null : lienProd,
+            dossierId: _dossierId,
           );
       if (mounted) context.pop();
     } finally {
@@ -77,9 +80,11 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
           if (!_initialized) {
             _nameController.text = projet.nom;
             _language = projet.langueParDefaut;
+            _dossierId = projet.dossierId;
             _prodLinkController.text = projet.lienProd ?? '';
             _initialized = true;
           }
+          final dossiersAsync = ref.watch(dossiersListProvider);
           return Padding(
             padding: const EdgeInsets.all(16),
             child: Form(
@@ -115,6 +120,28 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
                     onChanged: (value) {
                       if (value != null) setState(() => _language = value);
                     },
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<int?>(
+                    initialValue: _dossierId,
+                    decoration: InputDecoration(labelText: l10n.folderLabel),
+                    items: [
+                      DropdownMenuItem(
+                        value: null,
+                        child: Text(l10n.noFolderOption),
+                      ),
+                      ...dossiersAsync.maybeWhen(
+                        data: (dossiers) => dossiers.map(
+                          (dossier) => DropdownMenuItem(
+                            value: dossier.id,
+                            child: Text(dossier.nom),
+                          ),
+                        ),
+                        orElse: () =>
+                            const Iterable<DropdownMenuItem<int?>>.empty(),
+                      ),
+                    ],
+                    onChanged: (value) => setState(() => _dossierId = value),
                   ),
                   const SizedBox(height: 16),
                   TextFormField(

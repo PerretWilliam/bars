@@ -260,6 +260,7 @@ void main() {
         nom: 'Test project',
         langueParDefaut: 'fr',
         createdAt: DateTime(2026),
+        updatedAt: DateTime(2026),
         lienProd: 'https://example.com/beat',
       );
 

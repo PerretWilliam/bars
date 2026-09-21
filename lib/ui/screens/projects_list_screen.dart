@@ -5,16 +5,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../data/app_database.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/dossiers_provider.dart';
 import '../../providers/lignes_provider.dart';
+import '../../providers/projects_view_provider.dart';
 import '../../providers/projets_provider.dart';
 
 const _languageEmoji = {'fr': '🇫🇷', 'en': '🇬🇧'};
 
 class ProjectsListScreen extends ConsumerWidget {
-  const ProjectsListScreen({super.key});
+  const ProjectsListScreen({this.dossierId, super.key});
+
+  /// The folder being browsed, or null for the root (folder-less) list.
+  final int? dossierId;
 
   Future<void> _importProject(BuildContext context, WidgetRef ref) async {
     final files = await FilePicker.pickFiles(
@@ -74,59 +80,179 @@ class ProjectsListScreen extends ConsumerWidget {
     await FilePicker.saveFile(fileName: export.fileName, bytes: export.bytes);
   }
 
+  Future<void> _createFolder(BuildContext context, WidgetRef ref) async {
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController();
+    final nom = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.newFolderDialogTitle),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(labelText: l10n.folderNameLabel),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancelButton),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: Text(l10n.createButton),
+          ),
+        ],
+      ),
+    );
+    if (nom == null || nom.isEmpty) return;
+    await ref.read(dossiersControllerProvider).create(nom);
+  }
+
+  Future<void> _renameFolder(
+    BuildContext context,
+    WidgetRef ref,
+    Dossier dossier,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController(text: dossier.nom);
+    final nom = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.renameFolderDialogTitle),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          decoration: InputDecoration(labelText: l10n.folderNameLabel),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancelButton),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, controller.text.trim()),
+            child: Text(l10n.saveButton),
+          ),
+        ],
+      ),
+    );
+    if (nom == null || nom.isEmpty) return;
+    await ref.read(dossiersControllerProvider).rename(dossier.id, nom);
+  }
+
+  Future<void> _deleteFolder(
+    BuildContext context,
+    WidgetRef ref,
+    Dossier dossier,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.deleteFolderDialogTitle),
+        content: Text(l10n.deleteFolderDialogBody(dossier.nom)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancelButton),
+          ),
+          FilledButton.tonal(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.deleteButton),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await ref.read(dossiersControllerProvider).delete(dossier.id);
+    if (context.mounted) context.pop();
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final projetsAsync = ref.watch(projetsListProvider);
-
     final l10n = AppLocalizations.of(context)!;
+    final projetsAsync = ref.watch(projetsInDossierProvider(dossierId));
+    final viewMode = ref.watch(projectsViewModeProvider);
+    final currentDossierId = dossierId;
+    final dossier = currentDossierId == null
+        ? null
+        : ref.watch(dossierProvider(currentDossierId)).value;
+    final foldersAsync = currentDossierId == null
+        ? ref.watch(dossiersListProvider)
+        : const AsyncValue<List<Dossier>>.data([]);
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.projectsListTitle)),
+      appBar: AppBar(
+        title: Text(
+          currentDossierId == null
+              ? l10n.projectsListTitle
+              : (dossier?.nom ?? ''),
+        ),
+        actions: [
+          if (currentDossierId != null && dossier != null) ...[
+            IconButton(
+              icon: const Icon(LucideIcons.pencil),
+              tooltip: l10n.renameFolderTooltip,
+              onPressed: () => _renameFolder(context, ref, dossier),
+            ),
+            IconButton(
+              icon: const Icon(LucideIcons.trash),
+              tooltip: l10n.deleteFolderTooltip,
+              onPressed: () => _deleteFolder(context, ref, dossier),
+            ),
+          ],
+          IconButton(
+            icon: Icon(
+              viewMode == ProjectsViewMode.list
+                  ? LucideIcons.layout_grid
+                  : LucideIcons.list,
+            ),
+            tooltip: viewMode == ProjectsViewMode.list
+                ? l10n.viewAsGridTooltip
+                : l10n.viewAsListTooltip,
+            onPressed: () =>
+                ref.read(projectsViewModeProvider.notifier).toggle(),
+          ),
+          IconButton(
+            icon: const Icon(LucideIcons.folder_open),
+            tooltip: l10n.importProjectTooltip,
+            onPressed: () => _importProject(context, ref),
+          ),
+          if (currentDossierId == null)
+            IconButton(
+              icon: const Icon(LucideIcons.info),
+              tooltip: l10n.aboutTooltip,
+              onPressed: () => context.push('/about'),
+            ),
+        ],
+      ),
       body: projetsAsync.when(
         data: (projets) {
-          if (projets.isEmpty) {
+          final folders = foldersAsync.value ?? const <Dossier>[];
+          if (projets.isEmpty && folders.isEmpty) {
             return const _EmptyState();
           }
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            itemCount: projets.length,
-            itemBuilder: (context, index) {
-              final projet = projets[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Dismissible(
-                    key: ValueKey(projet.id),
-                    confirmDismiss: (direction) =>
-                        direction == DismissDirection.endToStart
-                        ? _confirmDelete(context, ref, projet)
-                        : _exportProject(
-                            context,
-                            ref,
-                            projet,
-                          ).then((_) => false),
-                    background: const _SwipeBackground(
-                      color: Colors.green,
-                      icon: LucideIcons.share_2,
-                      alignment: Alignment.centerLeft,
-                    ),
-                    secondaryBackground: const _SwipeBackground(
-                      color: Colors.red,
-                      icon: LucideIcons.trash,
-                      alignment: Alignment.centerRight,
-                    ),
-                    child: _ProjectCard(
-                      projet: projet,
-                      onTap: () => context.push('/project/${projet.id}'),
-                    ),
-                  ),
-                ),
-              );
-            },
+          return Column(
+            children: [
+              if (folders.isNotEmpty) _FoldersRow(folders: folders),
+              Expanded(
+                child: viewMode == ProjectsViewMode.list
+                    ? _ProjectsListView(
+                        projets: projets,
+                        onDeleted: (projet) =>
+                            _confirmDelete(context, ref, projet),
+                        onExported: (projet) =>
+                            _exportProject(context, ref, projet),
+                      )
+                    : _ProjectsGridView(
+                        projets: projets,
+                        onDeleted: (projet) =>
+                            _confirmDelete(context, ref, projet),
+                        onExported: (projet) =>
+                            _exportProject(context, ref, projet),
+                      ),
+              ),
+            ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -134,23 +260,162 @@ class ProjectsListScreen extends ConsumerWidget {
             Center(child: Text(l10n.errorGenericMessage('$error'))),
       ),
       floatingActionButton: _NewProjectFab(
-        onNewProject: () => context.push('/new'),
-        onImportProject: () => _importProject(context, ref),
+        onNewProject: () => context.push(
+          currentDossierId == null
+              ? '/new'
+              : '/new?dossierId=$currentDossierId',
+        ),
+        onNewFolder: currentDossierId == null
+            ? () => _createFolder(context, ref)
+            : null,
       ),
     );
   }
 }
 
-/// A `+` FAB that creates a new project on a plain tap; long-pressing
-/// reveals a secondary mini-FAB for importing a `.rapproj` bundle.
-class _NewProjectFab extends StatefulWidget {
-  const _NewProjectFab({
-    required this.onNewProject,
-    required this.onImportProject,
+class _FoldersRow extends StatelessWidget {
+  const _FoldersRow({required this.folders});
+
+  final List<Dossier> folders;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 48,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        itemCount: folders.length,
+        itemBuilder: (context, index) {
+          final dossier = folders[index];
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ActionChip(
+              avatar: const Icon(LucideIcons.folder, size: 18),
+              label: Text(dossier.nom),
+              onPressed: () => context.push('/folder/${dossier.id}'),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+typedef _ProjectAction = Future<void> Function(Projet projet);
+
+class _ProjectsListView extends StatelessWidget {
+  const _ProjectsListView({
+    required this.projets,
+    required this.onDeleted,
+    required this.onExported,
   });
 
+  final List<Projet> projets;
+  final Future<bool> Function(Projet projet) onDeleted;
+  final _ProjectAction onExported;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      itemCount: projets.length,
+      itemBuilder: (context, index) {
+        final projet = projets[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Dismissible(
+              key: ValueKey(projet.id),
+              confirmDismiss: (direction) =>
+                  direction == DismissDirection.endToStart
+                  ? onDeleted(projet)
+                  : onExported(projet).then((_) => false),
+              background: const _SwipeBackground(
+                color: Colors.green,
+                icon: LucideIcons.share_2,
+                alignment: Alignment.centerLeft,
+              ),
+              secondaryBackground: const _SwipeBackground(
+                color: Colors.red,
+                icon: LucideIcons.trash,
+                alignment: Alignment.centerRight,
+              ),
+              child: _ProjectCard(
+                projet: projet,
+                onTap: () => context.push('/project/${projet.id}'),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ProjectsGridView extends StatelessWidget {
+  const _ProjectsGridView({
+    required this.projets,
+    required this.onDeleted,
+    required this.onExported,
+  });
+
+  final List<Projet> projets;
+  final Future<bool> Function(Projet projet) onDeleted;
+  final _ProjectAction onExported;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 1.4,
+      ),
+      itemCount: projets.length,
+      itemBuilder: (context, index) {
+        final projet = projets[index];
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Dismissible(
+            key: ValueKey(projet.id),
+            confirmDismiss: (direction) =>
+                direction == DismissDirection.endToStart
+                ? onDeleted(projet)
+                : onExported(projet).then((_) => false),
+            background: const _SwipeBackground(
+              color: Colors.green,
+              icon: LucideIcons.share_2,
+              alignment: Alignment.centerLeft,
+            ),
+            secondaryBackground: const _SwipeBackground(
+              color: Colors.red,
+              icon: LucideIcons.trash,
+              alignment: Alignment.centerRight,
+            ),
+            child: _ProjectCard(
+              projet: projet,
+              onTap: () => context.push('/project/${projet.id}'),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// A `+` FAB that creates a new project on a plain tap; long-pressing
+/// reveals a secondary mini-FAB for creating a folder, when [onNewFolder]
+/// is non-null (folders can't be nested, so this is hidden while already
+/// browsing inside one).
+class _NewProjectFab extends StatefulWidget {
+  const _NewProjectFab({required this.onNewProject, this.onNewFolder});
+
   final VoidCallback onNewProject;
-  final VoidCallback onImportProject;
+  final VoidCallback? onNewFolder;
 
   @override
   State<_NewProjectFab> createState() => _NewProjectFabState();
@@ -161,25 +426,28 @@ class _NewProjectFabState extends State<_NewProjectFab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        if (_expanded)
+        if (_expanded && widget.onNewFolder != null)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: FloatingActionButton.small(
-              heroTag: 'importProjectFab',
-              tooltip: AppLocalizations.of(context)!.importProjectTooltip,
+              heroTag: 'newFolderFab',
+              tooltip: l10n.newFolderDialogTitle,
               onPressed: () {
                 setState(() => _expanded = false);
-                widget.onImportProject();
+                widget.onNewFolder!();
               },
-              child: const Icon(LucideIcons.folder_open),
+              child: const Icon(LucideIcons.folder_plus),
             ),
           ),
         GestureDetector(
-          onLongPress: () => setState(() => _expanded = !_expanded),
+          onLongPress: widget.onNewFolder == null
+              ? null
+              : () => setState(() => _expanded = !_expanded),
           child: FloatingActionButton(
             heroTag: 'newProjectFab',
             onPressed: () {
@@ -240,17 +508,33 @@ class _ProjectCard extends ConsumerWidget {
       },
       orElse: () => null,
     );
+    final date = DateFormat.yMMMd(Localizations.localeOf(context).toString())
+        .format(projet.updatedAt);
 
     return Card(
       elevation: 0,
-      color: colorScheme.surfaceContainerHigh,
+      color: Colors.transparent,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        title: Text(
-          '${_languageEmoji[projet.langueParDefaut] ?? ''} ${projet.nom}',
-          style: const TextStyle(fontWeight: FontWeight.w600),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                '${_languageEmoji[projet.langueParDefaut] ?? ''} ${projet.nom}',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Text(
+              date,
+              style: TextStyle(
+                fontSize: 12,
+                color: colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

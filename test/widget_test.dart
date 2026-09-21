@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:lyrics/data/app_database.dart';
 import 'package:lyrics/main.dart';
+import 'package:lyrics/providers/dossiers_provider.dart';
 import 'package:lyrics/providers/projets_provider.dart';
 
 void main() {
@@ -13,7 +14,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          projetsListProvider.overrideWith((ref) => Stream.value(<Projet>[])),
+          projetsInDossierProvider(null)
+              .overrideWith((ref) => Stream.value(<Projet>[])),
+          dossiersListProvider.overrideWith((ref) => Stream.value(<Dossier>[])),
         ],
         child: const MyApp(),
       ),

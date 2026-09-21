@@ -111,19 +111,32 @@ class ProjectEditorScreen extends ConsumerWidget {
                       key: ValueKey(ligne.id),
                       direction: DismissDirection.endToStart,
                       background: const _SwipeDeleteBackground(),
-                      onDismissed: (_) => controller.deleteLigne(ligne.id),
+                      onDismissed: (_) => controller.deleteLigne(
+                        id: ligne.id,
+                        projetId: projetId,
+                      ),
                       child: _LigneTile(
                         ligne: ligne,
                         index: index,
                         hasAudio: audio != null,
                         showTimecode: showTimecode,
                         isOutOfOrder: _isOutOfOrder(lignes, index),
-                        onTexteChanged: (texte) =>
-                            controller.updateTexte(ligne.id, texte),
+                        onTexteChanged: (texte) => controller.updateTexte(
+                          id: ligne.id,
+                          projetId: projetId,
+                          texte: texte,
+                        ),
                         onLangueDetected: (langue) =>
-                            controller.updateLangueDetectee(ligne.id, langue),
-                        onTimecodeChanged: (ms) =>
-                            controller.updateTimecode(ligne.id, ms),
+                            controller.updateLangueDetectee(
+                              id: ligne.id,
+                              projetId: projetId,
+                              langue: langue,
+                            ),
+                        onTimecodeChanged: (ms) => controller.updateTimecode(
+                          id: ligne.id,
+                          projetId: projetId,
+                          timecodeMs: ms,
+                        ),
                       ),
                     );
                   },

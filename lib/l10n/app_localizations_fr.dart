@@ -193,4 +193,102 @@ class AppLocalizationsFr extends AppLocalizations {
   String errorGenericMessage(String error) {
     return 'Une erreur est survenue : $error';
   }
+
+  @override
+  String get newFolderDialogTitle => 'Nouveau dossier';
+
+  @override
+  String get folderNameLabel => 'Nom du dossier';
+
+  @override
+  String get renameFolderDialogTitle => 'Renommer le dossier';
+
+  @override
+  String get renameFolderTooltip => 'Renommer le dossier';
+
+  @override
+  String get deleteFolderTooltip => 'Supprimer le dossier';
+
+  @override
+  String get deleteFolderDialogTitle => 'Supprimer le dossier ?';
+
+  @override
+  String deleteFolderDialogBody(String folderName) {
+    return 'Ceci supprime « $folderName ». Ses projets reviennent dans la liste principale — ils ne sont pas supprimés.';
+  }
+
+  @override
+  String get folderLabel => 'Dossier';
+
+  @override
+  String get noFolderOption => 'Aucun';
+
+  @override
+  String get viewAsListTooltip => 'Afficher en liste';
+
+  @override
+  String get viewAsGridTooltip => 'Afficher en grille';
+
+  @override
+  String get aboutTooltip => 'À propos';
+
+  @override
+  String get aboutTitle => 'À propos';
+
+  @override
+  String appVersionLabel(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get authorWebsiteTooltip => 'Visiter mon site';
+
+  @override
+  String get githubTooltip => 'Voir sur GitHub';
+
+  @override
+  String get buyMeACoffeeTooltip => 'M\'offrir un café';
+
+  @override
+  String get legalMenuLabel => 'Mentions légales';
+
+  @override
+  String get changelogMenuLabel => 'Historique des versions';
+
+  @override
+  String get donateMenuLabel => 'Soutenir le projet';
+
+  @override
+  String get contributingMenuLabel => 'Contribuer';
+
+  @override
+  String get legalTitle => 'Mentions légales';
+
+  @override
+  String get legalPlaceholderText =>
+      'Cette section est un espace réservé. Elle sera remplacée par la vraie politique de confidentialité et les conditions d\'utilisation avant une publication publique.';
+
+  @override
+  String get changelogTitle => 'Historique des versions';
+
+  @override
+  String get donateTitle => 'Soutenir le projet';
+
+  @override
+  String get donateIntro =>
+      'Cette app n\'a ni pub ni abonnement. Si tu veux aider à couvrir les frais de publication, voici à quoi ça sert :';
+
+  @override
+  String get googleGoalLabel => 'Inscription Google Play (unique)';
+
+  @override
+  String get appleGoalLabel => 'Apple Developer Program (annuel)';
+
+  @override
+  String donateAmountLabel(String raised, String goal) {
+    return '$raised € / $goal €';
+  }
+
+  @override
+  String get buyMeACoffeeButtonLabel => 'M\'offrir un café';
 }

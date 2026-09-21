@@ -3,12 +3,24 @@ import 'package:drift_flutter/drift_flutter.dart';
 
 part 'app_database.g.dart';
 
+class Dossiers extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get nom => text()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
 class Projets extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get nom => text()();
   TextColumn get langueParDefaut => text().withDefault(const Constant('fr'))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
   TextColumn get lienProd => text().nullable()();
+  IntColumn get dossierId => integer().nullable().references(
+    Dossiers,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
 }
 
 class Lignes extends Table {
@@ -43,7 +55,7 @@ class Rhymes extends Table {
   ];
 }
 
-@DriftDatabase(tables: [Projets, Lignes, Audios, Rhymes])
+@DriftDatabase(tables: [Dossiers, Projets, Lignes, Audios, Rhymes])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -53,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   // 100k+ row table; without indices those scans are slow enough to lose
   // the race with Riverpod's default provider auto-disposal.
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -68,6 +80,11 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 4) {
         await m.addColumn(projets, projets.lienProd);
+      }
+      if (from < 5) {
+        await m.createTable(dossiers);
+        await m.addColumn(projets, projets.updatedAt);
+        await m.addColumn(projets, projets.dossierId);
       }
     },
     // SQLite ignores declared `onDelete: KeyAction.cascade` foreign keys

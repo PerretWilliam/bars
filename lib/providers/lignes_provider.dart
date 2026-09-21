@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/app_database.dart';
 import 'database_provider.dart';
+import 'projets_provider.dart';
 
 final lignesForProjetProvider = StreamProvider.family<List<Ligne>, int>((
   ref,
@@ -20,38 +21,55 @@ class LignesController {
 
   final AppDatabase _db;
 
-  Future<void> addLigne({required int projetId, required int ordre}) {
-    return _db
+  Future<void> addLigne({required int projetId, required int ordre}) async {
+    await _db
         .into(_db.lignes)
         .insert(
           LignesCompanion.insert(projetId: projetId, texte: '', ordre: ordre),
         );
+    await touchProjet(_db, projetId);
   }
 
-  Future<void> deleteLigne(int id) {
-    return (_db.delete(_db.lignes)..where((l) => l.id.equals(id))).go();
+  Future<void> deleteLigne({required int id, required int projetId}) async {
+    await (_db.delete(_db.lignes)..where((l) => l.id.equals(id))).go();
+    await touchProjet(_db, projetId);
   }
 
-  Future<void> updateTexte(int id, String texte) {
-    return (_db.update(_db.lignes)..where((l) => l.id.equals(id))).write(
+  Future<void> updateTexte({
+    required int id,
+    required int projetId,
+    required String texte,
+  }) async {
+    await (_db.update(_db.lignes)..where((l) => l.id.equals(id))).write(
       LignesCompanion(texte: Value(texte)),
     );
+    await touchProjet(_db, projetId);
   }
 
-  Future<void> updateLangueDetectee(int id, String? langue) {
-    return (_db.update(_db.lignes)..where((l) => l.id.equals(id))).write(
+  Future<void> updateLangueDetectee({
+    required int id,
+    required int projetId,
+    required String? langue,
+  }) async {
+    await (_db.update(_db.lignes)..where((l) => l.id.equals(id))).write(
       LignesCompanion(langueDetectee: Value(langue)),
     );
+    await touchProjet(_db, projetId);
   }
 
-  Future<void> updateTimecode(int id, int? timecodeMs) {
-    return (_db.update(_db.lignes)..where((l) => l.id.equals(id))).write(
+  Future<void> updateTimecode({
+    required int id,
+    required int projetId,
+    required int? timecodeMs,
+  }) async {
+    await (_db.update(_db.lignes)..where((l) => l.id.equals(id))).write(
       LignesCompanion(timecodeMs: Value(timecodeMs)),
     );
+    await touchProjet(_db, projetId);
   }
 
-  Future<void> reorder(List<Ligne> lignesInNewOrder) {
-    return _db.transaction(() async {
+  Future<void> reorder(List<Ligne> lignesInNewOrder) async {
+    await _db.transaction(() async {
       for (var i = 0; i < lignesInNewOrder.length; i++) {
         final ligne = lignesInNewOrder[i];
         if (ligne.ordre == i) continue;
@@ -59,6 +77,9 @@ class LignesController {
             .write(LignesCompanion(ordre: Value(i)));
       }
     });
+    if (lignesInNewOrder.isNotEmpty) {
+      await touchProjet(_db, lignesInNewOrder.first.projetId);
+    }
   }
 }
 

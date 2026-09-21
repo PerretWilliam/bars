@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lyrics/data/app_database.dart';
 import 'package:lyrics/l10n/app_localizations.dart';
 import 'package:lyrics/providers/database_provider.dart';
+import 'package:lyrics/providers/dossiers_provider.dart';
 import 'package:lyrics/providers/projets_provider.dart';
 import 'package:lyrics/ui/screens/project_info_screen.dart';
 
@@ -35,10 +36,11 @@ void main() {
       ProviderScope(
         overrides: [
           databaseProvider.overrideWithValue(db),
-          // A static override, not the real drift watch: a widget test
+          // Static overrides, not the real drift watch: a widget test
           // that disposes a real drift stream can leak a cleanup timer
           // into flutter_test's pending-timer check.
           projetProvider(projetId).overrideWith((ref) => Stream.value(projet)),
+          dossiersListProvider.overrideWith((ref) => Stream.value(<Dossier>[])),
         ],
         child: MaterialApp.router(
           routerConfig: router,
