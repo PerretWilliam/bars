@@ -59,6 +59,11 @@ class ProjectEditorScreen extends ConsumerWidget {
         title: const Text('Notepad'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.mic),
+            tooltip: 'Rap mode',
+            onPressed: () => context.push('/project/$projetId/rap'),
+          ),
+          IconButton(
             icon: const Icon(Icons.ios_share),
             tooltip: 'Export project',
             onPressed: () => _exportProject(ref),

@@ -43,13 +43,13 @@ Policy: no manual implementation if a library already does it.
 
 ## Phase 5 — Rap mode
 
-- [ ] Clean display screen, with no editing elements
-- [ ] `scrollable_positioned_list` integration: scrolling locked to the line index matching the timecode
-- [ ] Auto-scroll sub-mode (follows audio playback if available)
-- [ ] Static sub-mode, manual scroll
-- [ ] `wakelock_plus` integration: prevents the screen from turning off during display
-- [ ] Full-screen mode via `SystemChrome` (immersive mode)
-- [ ] Font size adjustment for readability in studio/stage conditions
+- [x] Clean display screen, with no editing elements
+- [x] `scrollable_positioned_list` integration: scrolling locked to the line index matching the timecode
+- [x] Auto-scroll sub-mode (follows audio playback if available)
+- [x] Static sub-mode, manual scroll
+- [x] `wakelock_plus` integration: prevents the screen from turning off during display
+- [x] Full-screen mode via `SystemChrome` (immersive mode)
+- [x] Font size adjustment for readability in studio/stage conditions
 
 ## Phase 6 — Polish and personal distribution
 
