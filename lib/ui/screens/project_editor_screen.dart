@@ -104,7 +104,7 @@ class ProjectEditorScreen extends ConsumerWidget {
                     final ligne = lignes[index];
                     return Dismissible(
                       key: ValueKey(ligne.id),
-                      direction: DismissDirection.startToEnd,
+                      direction: DismissDirection.endToStart,
                       background: const _SwipeDeleteBackground(),
                       onDismissed: (_) => controller.deleteLigne(ligne.id),
                       child: _LigneTile(
@@ -656,7 +656,7 @@ class _SwipeDeleteBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.red,
-      alignment: Alignment.centerLeft,
+      alignment: Alignment.centerRight,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: const Icon(LucideIcons.trash, color: Colors.white),
     );

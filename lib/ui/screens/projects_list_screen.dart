@@ -92,25 +92,32 @@ class ProjectsListScreen extends ConsumerWidget {
                   horizontal: 12,
                   vertical: 6,
                 ),
-                child: Dismissible(
-                  key: ValueKey(projet.id),
-                  confirmDismiss: (direction) =>
-                      direction == DismissDirection.endToStart
-                      ? _confirmDelete(context, ref, projet)
-                      : _exportProject(context, ref, projet).then((_) => false),
-                  background: const _SwipeBackground(
-                    color: Colors.green,
-                    icon: LucideIcons.share_2,
-                    alignment: Alignment.centerLeft,
-                  ),
-                  secondaryBackground: const _SwipeBackground(
-                    color: Colors.red,
-                    icon: LucideIcons.trash,
-                    alignment: Alignment.centerRight,
-                  ),
-                  child: _ProjectCard(
-                    projet: projet,
-                    onTap: () => context.push('/project/${projet.id}'),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Dismissible(
+                    key: ValueKey(projet.id),
+                    confirmDismiss: (direction) =>
+                        direction == DismissDirection.endToStart
+                        ? _confirmDelete(context, ref, projet)
+                        : _exportProject(
+                            context,
+                            ref,
+                            projet,
+                          ).then((_) => false),
+                    background: const _SwipeBackground(
+                      color: Colors.green,
+                      icon: LucideIcons.share_2,
+                      alignment: Alignment.centerLeft,
+                    ),
+                    secondaryBackground: const _SwipeBackground(
+                      color: Colors.red,
+                      icon: LucideIcons.trash,
+                      alignment: Alignment.centerRight,
+                    ),
+                    child: _ProjectCard(
+                      projet: projet,
+                      onTap: () => context.push('/project/${projet.id}'),
+                    ),
                   ),
                 ),
               );
@@ -199,10 +206,7 @@ class _SwipeBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      color: color,
       alignment: alignment,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Icon(icon, color: Colors.white),

@@ -182,7 +182,7 @@ void main() {
     expect(find.byKey(const ValueKey('timecode-1')), findsNothing);
   });
 
-  testWidgets('swiping a line right deletes it', (tester) async {
+  testWidgets('swiping a line left deletes it', (tester) async {
     final db = AppDatabase.forTesting(NativeDatabase.memory());
     addTearDown(db.close);
     await db
@@ -217,7 +217,7 @@ void main() {
     // frame the tree is guaranteed to settle on.
     final tileRect = tester.getRect(find.byType(Dismissible));
     final dragStart = Offset(tileRect.left + 2, tileRect.center.dy);
-    await tester.dragFrom(dragStart, const Offset(500, 0));
+    await tester.dragFrom(dragStart, const Offset(-500, 0));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pump(const Duration(milliseconds: 300));
