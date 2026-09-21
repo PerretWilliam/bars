@@ -1,4 +1,4 @@
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lyrics/data/app_database.dart';
@@ -49,5 +49,22 @@ void main() {
       db.lignes,
     )..orderBy([(l) => OrderingTerm(expression: l.ordre)])).get();
     expect(reordered.map((l) => l.id), [lignes.last.id, lignes.first.id]);
+  });
+
+  test('updateTimecode sets and clears a line\'s timecode', () async {
+    await controller.addLigne(projetId: 1, ordre: 0);
+    final ligne = (await db.select(db.lignes).get()).single;
+
+    await controller.updateTimecode(ligne.id, 4200);
+    var updated = await (db.select(
+      db.lignes,
+    )..where((l) => l.id.equals(ligne.id))).getSingle();
+    expect(updated.timecodeMs, 4200);
+
+    await controller.updateTimecode(ligne.id, null);
+    updated = await (db.select(
+      db.lignes,
+    )..where((l) => l.id.equals(ligne.id))).getSingle();
+    expect(updated.timecodeMs, isNull);
   });
 }

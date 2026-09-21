@@ -44,6 +44,12 @@ class LignesController {
     );
   }
 
+  Future<void> updateTimecode(int id, int? timecodeMs) {
+    return (_db.update(_db.lignes)..where((l) => l.id.equals(id))).write(
+      LignesCompanion(timecodeMs: Value(timecodeMs)),
+    );
+  }
+
   Future<void> reorder(List<Ligne> lignesInNewOrder) {
     return _db.transaction(() async {
       for (var i = 0; i < lignesInNewOrder.length; i++) {

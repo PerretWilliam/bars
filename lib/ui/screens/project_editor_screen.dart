@@ -24,6 +24,11 @@ class ProjectEditorScreen extends ConsumerWidget {
         title: const Text('Notepad'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.graphic_eq),
+            tooltip: 'Timecodes',
+            onPressed: () => context.push('/project/$projetId/timecode'),
+          ),
+          IconButton(
             icon: const Icon(Icons.menu_book_outlined),
             tooltip: 'Rhyme dictionaries',
             onPressed: () => context.push('/dictionaries'),
