@@ -67,7 +67,7 @@ class ProjectEditorScreen extends ConsumerWidget {
                 ref.read(timecodeVisibleProvider.notifier).toggle(),
           ),
           IconButton(
-            icon: const Icon(Icons.mic),
+            icon: const Icon(Icons.play_arrow),
             tooltip: 'Rap mode',
             onPressed: () => context.push('/project/$projetId/rap'),
           ),
@@ -179,20 +179,43 @@ class _AddFabState extends State<_AddFab> {
 
   Widget _miniFab({
     required String heroTag,
-    required String tooltip,
+    required String label,
     required IconData icon,
     required VoidCallback onPressed,
   }) {
+    void handlePressed() {
+      setState(() => _expanded = false);
+      onPressed();
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: FloatingActionButton.small(
-        heroTag: heroTag,
-        tooltip: tooltip,
-        onPressed: () {
-          setState(() => _expanded = false);
-          onPressed();
-        },
-        child: Icon(icon),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Material(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(8),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: handlePressed,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                child: Text(label),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          FloatingActionButton.small(
+            heroTag: heroTag,
+            tooltip: label,
+            onPressed: handlePressed,
+            child: Icon(icon),
+          ),
+        ],
       ),
     );
   }
@@ -206,25 +229,25 @@ class _AddFabState extends State<_AddFab> {
         if (_expanded) ...[
           _miniFab(
             heroTag: 'dictionariesFab',
-            tooltip: 'Rhyme dictionaries',
+            label: 'Rhyme dictionaries',
             icon: Icons.menu_book_outlined,
             onPressed: widget.onDictionaries,
           ),
           _miniFab(
             heroTag: 'exportProjectFab',
-            tooltip: 'Export project',
+            label: 'Export project',
             icon: Icons.ios_share,
             onPressed: widget.onExportProject,
           ),
           _miniFab(
             heroTag: 'projectInfoFab',
-            tooltip: 'Project info',
+            label: 'Project info',
             icon: Icons.info_outline,
             onPressed: widget.onProjectInfo,
           ),
           _miniFab(
             heroTag: 'importAudioFab',
-            tooltip: 'Import audio file',
+            label: 'Import audio file',
             icon: Icons.audio_file_outlined,
             onPressed: widget.onImportAudio,
           ),
