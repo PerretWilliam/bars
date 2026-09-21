@@ -44,6 +44,9 @@ dependencies:
   drift_flutter: ^0.3.1
   flutter_langdetect: ^0.0.2
   http: ^1.6.0
+  file_picker: ^13.1.0
+  just_audio: ^0.10.6
+  just_waveform: ^0.0.7
 
 dev_dependencies:
   flutter_test:
