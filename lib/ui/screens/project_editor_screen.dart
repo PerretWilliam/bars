@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
@@ -69,13 +70,13 @@ class ProjectEditorScreen extends ConsumerWidget {
         title: const Text('Notepad'),
         actions: [
           IconButton(
-            icon: Icon(showTimecode ? Icons.schedule : Icons.schedule_outlined),
+            icon: Icon(showTimecode ? LucideIcons.eye : LucideIcons.eye_off),
             tooltip: showTimecode ? 'Hide timecodes' : 'Show timecodes',
             onPressed: () =>
                 ref.read(timecodeVisibleProvider.notifier).toggle(),
           ),
           IconButton(
-            icon: const Icon(Icons.play_arrow),
+            icon: const Icon(LucideIcons.play),
             tooltip: 'Rap mode',
             onPressed: () => context.push('/project/$projetId/rap'),
           ),
@@ -244,31 +245,31 @@ class _AddFabState extends State<_AddFab> {
             _miniFab(
               heroTag: 'openProdFab',
               label: 'Open prod',
-              icon: Icons.link,
+              icon: LucideIcons.link,
               onPressed: onOpenProd,
             ),
           _miniFab(
             heroTag: 'dictionariesFab',
             label: 'Rhyme dictionaries',
-            icon: Icons.menu_book_outlined,
+            icon: LucideIcons.book_open,
             onPressed: widget.onDictionaries,
           ),
           _miniFab(
             heroTag: 'exportProjectFab',
             label: 'Export project',
-            icon: Icons.ios_share,
+            icon: LucideIcons.share_2,
             onPressed: widget.onExportProject,
           ),
           _miniFab(
             heroTag: 'projectInfoFab',
             label: 'Project info',
-            icon: Icons.info_outline,
+            icon: LucideIcons.info,
             onPressed: widget.onProjectInfo,
           ),
           _miniFab(
             heroTag: 'importAudioFab',
             label: 'Import audio file',
-            icon: Icons.audio_file_outlined,
+            icon: LucideIcons.file_music,
             onPressed: widget.onImportAudio,
           ),
         ],
@@ -283,7 +284,7 @@ class _AddFabState extends State<_AddFab> {
                 widget.onAddLine();
               }
             },
-            child: Icon(_expanded ? Icons.close : Icons.add),
+            child: Icon(_expanded ? LucideIcons.x : LucideIcons.plus),
           ),
         ),
       ],
@@ -424,7 +425,7 @@ class _AudioSectionState extends ConsumerState<_AudioSection> {
                 builder: (context, snapshot) {
                   final playing = snapshot.data ?? false;
                   return IconButton.filled(
-                    icon: Icon(playing ? Icons.pause : Icons.play_arrow),
+                    icon: Icon(playing ? LucideIcons.pause : LucideIcons.play),
                     onPressed: () => playing ? _player.pause() : _player.play(),
                   );
                 },
@@ -435,7 +436,7 @@ class _AudioSectionState extends ConsumerState<_AudioSection> {
               ),
               const SizedBox(width: 12),
               IconButton(
-                icon: const Icon(Icons.delete_outline),
+                icon: const Icon(LucideIcons.trash),
                 tooltip: 'Remove audio',
                 onPressed: _removeAudio,
               ),
@@ -578,12 +579,14 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
         ListTile(
           leading: ReorderableDragStartListener(
             index: widget.index,
-            child: const Icon(Icons.drag_handle),
+            child: const Icon(LucideIcons.grip_vertical),
           ),
           title: TextField(
             controller: _textController,
             focusNode: _focusNode,
             decoration: const InputDecoration(border: InputBorder.none),
+            minLines: 1,
+            maxLines: null,
             onChanged: _onTexteChanged,
           ),
           subtitle: widget.ligne.langueDetectee == null
@@ -599,7 +602,7 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
                         child: Tooltip(
                           message: 'Earlier than the previous line\'s timecode',
                           child: Icon(
-                            Icons.warning_amber_rounded,
+                            LucideIcons.triangle_alert,
                             size: 18,
                             color: Colors.orange,
                           ),
@@ -626,7 +629,7 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
                     ),
                     if (widget.hasAudio)
                       IconButton(
-                        icon: const Icon(Icons.flag_outlined, size: 20),
+                        icon: const Icon(LucideIcons.flag, size: 20),
                         tooltip: 'Mark at current playback time',
                         visualDensity: VisualDensity.compact,
                         onPressed: _markNow,
@@ -655,7 +658,7 @@ class _SwipeDeleteBackground extends StatelessWidget {
       color: Colors.red,
       alignment: Alignment.centerLeft,
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: const Icon(Icons.delete_outline, color: Colors.white),
+      child: const Icon(LucideIcons.trash, color: Colors.white),
     );
   }
 }

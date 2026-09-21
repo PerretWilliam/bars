@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -117,7 +118,7 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
                       labelText: 'Prod link (optional)',
                       hintText: 'https://…',
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.open_in_new),
+                        icon: const Icon(LucideIcons.external_link),
                         tooltip: 'Open link',
                         onPressed: _openProdLink,
                       ),

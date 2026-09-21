@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -334,13 +335,13 @@ class _RapModeControls extends ConsumerWidget {
           child: Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.close, color: Colors.white),
+                icon: const Icon(LucideIcons.x, color: Colors.white),
                 onPressed: onExit,
               ),
               const Spacer(),
               IconButton(
                 icon: Icon(
-                  Icons.repeat,
+                  LucideIcons.repeat,
                   color: loop ? Colors.deepPurpleAccent : Colors.white,
                 ),
                 tooltip: loop
@@ -349,20 +350,20 @@ class _RapModeControls extends ConsumerWidget {
                 onPressed: onToggleLoop,
               ),
               IconButton(
-                icon: const Icon(Icons.text_decrease, color: Colors.white),
+                icon: const Icon(LucideIcons.a_arrow_down, color: Colors.white),
                 onPressed: () =>
                     ref.read(rapModeFontSizeProvider.notifier).decrease(),
               ),
               IconButton(
-                icon: const Icon(Icons.text_increase, color: Colors.white),
+                icon: const Icon(LucideIcons.a_arrow_up, color: Colors.white),
                 onPressed: () =>
                     ref.read(rapModeFontSizeProvider.notifier).increase(),
               ),
               IconButton(
                 icon: Icon(
                   subMode == RapModeSubMode.auto
-                      ? Icons.sync
-                      : Icons.pan_tool_alt_outlined,
+                      ? LucideIcons.refresh_cw
+                      : LucideIcons.hand,
                   color: Colors.white,
                 ),
                 tooltip: subMode == RapModeSubMode.auto
@@ -383,7 +384,9 @@ class _RapModeControls extends ConsumerWidget {
                     final playing = snapshot.data ?? false;
                     return IconButton.filled(
                       iconSize: 40,
-                      icon: Icon(playing ? Icons.pause : Icons.play_arrow),
+                      icon: Icon(
+                        playing ? LucideIcons.pause : LucideIcons.play,
+                      ),
                       onPressed: () =>
                           playing ? player!.pause() : player!.play(),
                     );
@@ -394,7 +397,9 @@ class _RapModeControls extends ConsumerWidget {
                   tooltip: virtualPlaying
                       ? 'Pause the timer-based auto-scroll'
                       : 'Start timer-based auto-scroll (no audio file)',
-                  icon: Icon(virtualPlaying ? Icons.pause : Icons.play_arrow),
+                  icon: Icon(
+                    virtualPlaying ? LucideIcons.pause : LucideIcons.play,
+                  ),
                   onPressed: onToggleVirtualClock,
                 ),
         ),

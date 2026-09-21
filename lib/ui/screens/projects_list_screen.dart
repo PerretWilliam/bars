@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -99,12 +100,12 @@ class ProjectsListScreen extends ConsumerWidget {
                       : _exportProject(context, ref, projet).then((_) => false),
                   background: const _SwipeBackground(
                     color: Colors.green,
-                    icon: Icons.ios_share,
+                    icon: LucideIcons.share_2,
                     alignment: Alignment.centerLeft,
                   ),
                   secondaryBackground: const _SwipeBackground(
                     color: Colors.red,
-                    icon: Icons.delete_outline,
+                    icon: LucideIcons.trash,
                     alignment: Alignment.centerRight,
                   ),
                   child: _ProjectCard(
@@ -162,7 +163,7 @@ class _NewProjectFabState extends State<_NewProjectFab> {
                 setState(() => _expanded = false);
                 widget.onImportProject();
               },
-              child: const Icon(Icons.file_open_outlined),
+              child: const Icon(LucideIcons.folder_open),
             ),
           ),
         GestureDetector(
@@ -176,7 +177,7 @@ class _NewProjectFabState extends State<_NewProjectFab> {
                 widget.onNewProject();
               }
             },
-            child: Icon(_expanded ? Icons.close : Icons.add),
+            child: Icon(_expanded ? LucideIcons.x : LucideIcons.plus),
           ),
         ),
       ],
@@ -260,7 +261,7 @@ class _ProjectCard extends ConsumerWidget {
             ),
           ],
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const Icon(LucideIcons.chevron_right),
         onTap: onTap,
       ),
     );
@@ -278,7 +279,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.mic_none, size: 64),
+            const Icon(LucideIcons.mic, size: 64),
             const SizedBox(height: 16),
             Text(
               'No projects yet',

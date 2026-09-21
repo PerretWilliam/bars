@@ -8,6 +8,7 @@ import 'package:lyrics/providers/database_provider.dart';
 import 'package:lyrics/providers/lignes_provider.dart';
 import 'package:lyrics/providers/projets_provider.dart';
 import 'package:lyrics/ui/screens/project_editor_screen.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 
 void main() {
   testWidgets('long-pressing the + FAB reveals the import-audio action', (
@@ -29,7 +30,7 @@ void main() {
     expect(find.text('No lines yet. Tap + to start.'), findsOneWidget);
     expect(find.byTooltip('Import audio file'), findsNothing);
 
-    await tester.longPress(find.byIcon(Icons.add));
+    await tester.longPress(find.byIcon(LucideIcons.plus));
     await tester.pump();
 
     expect(find.byTooltip('Import audio file'), findsOneWidget);
@@ -146,7 +147,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+      expect(find.byIcon(LucideIcons.triangle_alert), findsOneWidget);
     },
   );
 
@@ -175,7 +176,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('timecode-1')), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.schedule));
+    await tester.tap(find.byIcon(LucideIcons.eye));
     await tester.pump();
 
     expect(find.byKey(const ValueKey('timecode-1')), findsNothing);
@@ -250,7 +251,7 @@ void main() {
       );
       await tester.pump();
 
-      await tester.longPress(find.byIcon(Icons.add));
+      await tester.longPress(find.byIcon(LucideIcons.plus));
       await tester.pump();
 
       expect(find.byTooltip('Open prod'), findsOneWidget);
@@ -273,7 +274,7 @@ void main() {
     );
     await tester.pump();
 
-    await tester.longPress(find.byIcon(Icons.add));
+    await tester.longPress(find.byIcon(LucideIcons.plus));
     await tester.pump();
 
     expect(find.byTooltip('Open prod'), findsNothing);

@@ -5,6 +5,7 @@ import 'package:lyrics/data/app_database.dart';
 import 'package:lyrics/providers/lignes_provider.dart';
 import 'package:lyrics/providers/projets_provider.dart';
 import 'package:lyrics/ui/screens/projects_list_screen.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 
 void main() {
   testWidgets('long-pressing the + FAB reveals the import-project action', (
@@ -23,7 +24,7 @@ void main() {
     expect(find.text('No projects yet'), findsOneWidget);
     expect(find.byTooltip('Import project'), findsNothing);
 
-    await tester.longPress(find.byIcon(Icons.add));
+    await tester.longPress(find.byIcon(LucideIcons.plus));
     await tester.pump();
 
     expect(find.byTooltip('Import project'), findsOneWidget);

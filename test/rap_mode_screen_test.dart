@@ -6,6 +6,7 @@ import 'package:lyrics/providers/audio_provider.dart';
 import 'package:lyrics/providers/lignes_provider.dart';
 import 'package:lyrics/ui/screens/rap_mode_screen.dart';
 import 'package:wakelock_plus_platform_interface/wakelock_plus_platform_interface.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 
 class _FakeWakelockPlusPlatform extends WakelockPlusPlatformInterface {
   bool _enabled = false;
@@ -71,7 +72,7 @@ void main() {
 
     final initialSize = styleOf(tester, 'First line').style.fontSize!;
 
-    await tester.tap(find.byIcon(Icons.text_increase));
+    await tester.tap(find.byIcon(LucideIcons.a_arrow_up));
     await tester.pump();
 
     expect(
@@ -85,14 +86,14 @@ void main() {
   ) async {
     await pumpRapMode(tester);
 
-    expect(find.byIcon(Icons.sync), findsOneWidget);
-    expect(find.byIcon(Icons.pan_tool_alt_outlined), findsNothing);
+    expect(find.byIcon(LucideIcons.refresh_cw), findsOneWidget);
+    expect(find.byIcon(LucideIcons.hand), findsNothing);
 
-    await tester.tap(find.byIcon(Icons.sync));
+    await tester.tap(find.byIcon(LucideIcons.refresh_cw));
     await tester.pump();
 
-    expect(find.byIcon(Icons.sync), findsNothing);
-    expect(find.byIcon(Icons.pan_tool_alt_outlined), findsOneWidget);
+    expect(find.byIcon(LucideIcons.refresh_cw), findsNothing);
+    expect(find.byIcon(LucideIcons.hand), findsOneWidget);
   });
 
   testWidgets(
@@ -100,17 +101,17 @@ void main() {
     (tester) async {
       await pumpRapMode(tester);
 
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(find.byIcon(LucideIcons.play), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.tap(find.byIcon(LucideIcons.play));
       await tester.pump();
 
-      expect(find.byIcon(Icons.pause), findsOneWidget);
+      expect(find.byIcon(LucideIcons.pause), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.pause));
+      await tester.tap(find.byIcon(LucideIcons.pause));
       await tester.pump();
 
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(find.byIcon(LucideIcons.play), findsOneWidget);
     },
   );
 
@@ -122,7 +123,7 @@ void main() {
       expect(styleOf(tester, 'First line').style.color, Colors.white38);
       expect(styleOf(tester, 'Second line').style.color, Colors.white38);
 
-      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.tap(find.byIcon(LucideIcons.play));
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(styleOf(tester, 'First line').style.color, Colors.white);
@@ -135,7 +136,7 @@ void main() {
 
       // The clock already auto-paused on reaching the last timecode, so
       // there's no running timer left to clean up here.
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(find.byIcon(LucideIcons.play), findsOneWidget);
     },
   );
 
@@ -158,10 +159,10 @@ void main() {
     (tester) async {
       await pumpRapMode(tester);
 
-      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.tap(find.byIcon(LucideIcons.play));
       await tester.pump(const Duration(seconds: 6));
 
-      expect(find.byIcon(Icons.play_arrow), findsOneWidget);
+      expect(find.byIcon(LucideIcons.play), findsOneWidget);
       expect(styleOf(tester, 'Second line').style.color, Colors.white);
     },
   );
@@ -171,15 +172,15 @@ void main() {
     (tester) async {
       await pumpRapMode(tester);
 
-      await tester.tap(find.byIcon(Icons.repeat));
+      await tester.tap(find.byIcon(LucideIcons.repeat));
       await tester.pump();
 
-      await tester.tap(find.byIcon(Icons.play_arrow));
+      await tester.tap(find.byIcon(LucideIcons.play));
       await tester.pump(const Duration(seconds: 6));
 
-      expect(find.byIcon(Icons.pause), findsOneWidget);
+      expect(find.byIcon(LucideIcons.pause), findsOneWidget);
 
-      await tester.tap(find.byIcon(Icons.pause));
+      await tester.tap(find.byIcon(LucideIcons.pause));
       await tester.pump();
     },
   );
