@@ -27,7 +27,7 @@ class ProjectsListScreen extends ConsumerWidget {
     await ref.read(projectBundleServiceProvider).importBundle(File(path));
   }
 
-  Future<void> _confirmDelete(
+  Future<bool> _confirmDelete(
     BuildContext context,
     WidgetRef ref,
     Projet projet,
@@ -51,9 +51,20 @@ class ProjectsListScreen extends ConsumerWidget {
         ],
       ),
     );
-    if (confirmed == true) {
-      await ref.read(projetsControllerProvider).delete(projet.id);
-    }
+    if (confirmed != true) return false;
+    await ref.read(projetsControllerProvider).delete(projet.id);
+    return true;
+  }
+
+  Future<void> _exportProject(
+    BuildContext context,
+    WidgetRef ref,
+    Projet projet,
+  ) async {
+    final export = await ref
+        .read(projectBundleServiceProvider)
+        .exportProject(projet.id);
+    await FilePicker.saveFile(fileName: export.fileName, bytes: export.bytes);
   }
 
   @override
@@ -71,14 +82,28 @@ class ProjectsListScreen extends ConsumerWidget {
             itemCount: projets.length,
             itemBuilder: (context, index) {
               final projet = projets[index];
-              return ListTile(
-                title: Text(projet.nom),
-                subtitle: Text(projet.langueParDefaut.toUpperCase()),
-                onTap: () => context.push('/project/${projet.id}'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  tooltip: 'Delete project',
-                  onPressed: () => _confirmDelete(context, ref, projet),
+              return Dismissible(
+                key: ValueKey(projet.id),
+                confirmDismiss: (direction) =>
+                    direction == DismissDirection.endToStart
+                    ? _confirmDelete(context, ref, projet)
+                    : _exportProject(context, ref, projet).then((_) => false),
+                background: Container(
+                  color: Colors.green,
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.ios_share, color: Colors.white),
+                ),
+                secondaryBackground: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete_outline, color: Colors.white),
+                ),
+                child: ListTile(
+                  title: Text(projet.nom),
+                  subtitle: Text(projet.langueParDefaut.toUpperCase()),
+                  onTap: () => context.push('/project/${projet.id}'),
                 ),
               );
             },
