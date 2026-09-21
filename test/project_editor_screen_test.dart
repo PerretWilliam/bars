@@ -74,4 +74,148 @@ void main() {
     )..where((l) => l.id.equals(ligne.id))).getSingle();
     expect(updated.timecodeMs, (12 * 60 + 34) * 1000);
   });
+
+  testWidgets('rejects a seconds part of 60 or more, e.g. 00:90', (
+    tester,
+  ) async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+    await db
+        .into(db.projets)
+        .insert(ProjetsCompanion.insert(nom: 'Test project'));
+    await db
+        .into(db.lignes)
+        .insert(LignesCompanion.insert(projetId: 1, texte: 'la', ordre: 0));
+    final ligne = (await db.select(db.lignes).get()).single;
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
+          lignesForProjetProvider(1)
+              .overrideWith((ref) => Stream.value([ligne])),
+        ],
+        child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+      ),
+    );
+    await tester.pump();
+
+    final timecodeField = find.byKey(ValueKey('timecode-${ligne.id}'));
+    await tester.enterText(timecodeField, '0090');
+    await tester.pump();
+
+    expect(find.text('00:90'), findsOneWidget);
+
+    await tester.tap(find.text('Notepad'));
+    await tester.pump();
+
+    // Invalid input reverts the field instead of being persisted.
+    expect(find.text('00:90'), findsNothing);
+    final updated = await (db.select(
+      db.lignes,
+    )..where((l) => l.id.equals(ligne.id))).getSingle();
+    expect(updated.timecodeMs, isNull);
+  });
+
+  testWidgets(
+    'shows a warning when a line is earlier than the previous timecode',
+    (tester) async {
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+      final lignes = [
+        Ligne(id: 1, projetId: 1, texte: 'First', ordre: 0, timecodeMs: 3000),
+        Ligne(id: 2, projetId: 1, texte: 'Second', ordre: 1, timecodeMs: 0),
+      ];
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            databaseProvider.overrideWithValue(db),
+            audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
+            lignesForProjetProvider(1)
+                .overrideWith((ref) => Stream.value(lignes)),
+          ],
+          child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+        ),
+      );
+      await tester.pump();
+
+      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+    },
+  );
+
+  testWidgets('the timecode toggle hides and shows the timecode column', (
+    tester,
+  ) async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+    final lignes = [
+      Ligne(id: 1, projetId: 1, texte: 'First', ordre: 0, timecodeMs: 0),
+    ];
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
+          lignesForProjetProvider(1)
+              .overrideWith((ref) => Stream.value(lignes)),
+        ],
+        child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('timecode-1')), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.schedule));
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('timecode-1')), findsNothing);
+  });
+
+  testWidgets('swiping a line right deletes it', (tester) async {
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+    await db
+        .into(db.projets)
+        .insert(ProjetsCompanion.insert(nom: 'Test project'));
+    await db
+        .into(db.lignes)
+        .insert(LignesCompanion.insert(projetId: 1, texte: 'la', ordre: 0));
+    final ligne = (await db.select(db.lignes).get()).single;
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          databaseProvider.overrideWithValue(db),
+          audioForProjetProvider(1).overrideWith((ref) => Stream.value(null)),
+          lignesForProjetProvider(1)
+              .overrideWith((ref) => Stream.value([ligne])),
+        ],
+        child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+      ),
+    );
+    await tester.pump();
+
+    // Drag from blank space at the tile's left edge, not the drag-handle
+    // icon (that starts a reorder) and not the TextField (a plain
+    // horizontal drag there is claimed by its own text-selection gesture
+    // before it reaches the Dismissible).
+    //
+    // Bounded pumps instead of pumpAndSettle: the overridden lignes stream
+    // here is static (doesn't shrink after the delete), so there's no
+    // frame the tree is guaranteed to settle on.
+    final tileRect = tester.getRect(find.byType(Dismissible));
+    final dragStart = Offset(tileRect.left + 2, tileRect.center.dy);
+    await tester.dragFrom(dragStart, const Offset(500, 0));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(await db.select(db.lignes).get(), isEmpty);
+  });
 }

@@ -11,6 +11,7 @@ import 'package:just_waveform/just_waveform.dart';
 import '../../data/app_database.dart';
 import '../../providers/audio_provider.dart';
 import '../../providers/lignes_provider.dart';
+import '../../providers/notepad_provider.dart';
 import '../../providers/projets_provider.dart';
 import '../../services/language_detector.dart';
 import '../../services/waveform_extractor.dart';
@@ -53,25 +54,49 @@ class ProjectEditorScreen extends ConsumerWidget {
     final lignesAsync = ref.watch(lignesForProjetProvider(projetId));
     final audio = ref.watch(audioForProjetProvider(projetId)).value;
     final controller = ref.read(lignesControllerProvider);
+    final showTimecode = ref.watch(timecodeVisibleProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notepad'),
         actions: [
           IconButton(
+            icon: Icon(showTimecode ? Icons.schedule : Icons.schedule_outlined),
+            tooltip: showTimecode ? 'Hide timecodes' : 'Show timecodes',
+            onPressed: () =>
+                ref.read(timecodeVisibleProvider.notifier).toggle(),
+          ),
+          IconButton(
             icon: const Icon(Icons.mic),
             tooltip: 'Rap mode',
             onPressed: () => context.push('/project/$projetId/rap'),
           ),
-          IconButton(
-            icon: const Icon(Icons.ios_share),
-            tooltip: 'Export project',
-            onPressed: () => _exportProject(ref),
-          ),
-          IconButton(
-            icon: const Icon(Icons.menu_book_outlined),
-            tooltip: 'Rhyme dictionaries',
-            onPressed: () => context.push('/dictionaries'),
+          PopupMenuButton<_MenuAction>(
+            tooltip: 'More',
+            onSelected: (action) {
+              switch (action) {
+                case _MenuAction.info:
+                  context.push('/project/$projetId/info');
+                case _MenuAction.export:
+                  _exportProject(ref);
+                case _MenuAction.dictionaries:
+                  context.push('/dictionaries');
+              }
+            },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: _MenuAction.info,
+                child: Text('Project info'),
+              ),
+              PopupMenuItem(
+                value: _MenuAction.export,
+                child: Text('Export project'),
+              ),
+              PopupMenuItem(
+                value: _MenuAction.dictionaries,
+                child: Text('Rhyme dictionaries'),
+              ),
+            ],
           ),
         ],
       ),
@@ -87,20 +112,32 @@ class ProjectEditorScreen extends ConsumerWidget {
                   );
                 }
                 return ReorderableListView.builder(
+                  physics: const ClampingScrollPhysics(),
+                  // The default long-press-anywhere drag would compete with
+                  // Dismissible's swipe-to-delete gesture below, so dragging
+                  // is only started from the explicit handle icon.
+                  buildDefaultDragHandles: false,
                   itemCount: lignes.length,
                   itemBuilder: (context, index) {
                     final ligne = lignes[index];
-                    return _LigneTile(
+                    return Dismissible(
                       key: ValueKey(ligne.id),
-                      ligne: ligne,
-                      hasAudio: audio != null,
-                      onDelete: () => controller.deleteLigne(ligne.id),
-                      onTexteChanged: (texte) =>
-                          controller.updateTexte(ligne.id, texte),
-                      onLangueDetected: (langue) =>
-                          controller.updateLangueDetectee(ligne.id, langue),
-                      onTimecodeChanged: (ms) =>
-                          controller.updateTimecode(ligne.id, ms),
+                      direction: DismissDirection.startToEnd,
+                      background: const _SwipeDeleteBackground(),
+                      onDismissed: (_) => controller.deleteLigne(ligne.id),
+                      child: _LigneTile(
+                        ligne: ligne,
+                        index: index,
+                        hasAudio: audio != null,
+                        showTimecode: showTimecode,
+                        isOutOfOrder: _isOutOfOrder(lignes, index),
+                        onTexteChanged: (texte) =>
+                            controller.updateTexte(ligne.id, texte),
+                        onLangueDetected: (langue) =>
+                            controller.updateLangueDetectee(ligne.id, langue),
+                        onTimecodeChanged: (ms) =>
+                            controller.updateTimecode(ligne.id, ms),
+                      ),
                     );
                   },
                   onReorderItem: (index, newIndex) {
@@ -124,6 +161,22 @@ class ProjectEditorScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+enum _MenuAction { info, export, dictionaries }
+
+/// Whether `lignes[index]`'s timecode is out of chronological order relative
+/// to the nearest preceding and following lines that have one set. Lines
+/// without a timecode never count as out of order.
+bool _isOutOfOrder(List<Ligne> lignes, int index) {
+  final current = lignes[index].timecodeMs;
+  if (current == null) return false;
+
+  for (var i = index - 1; i >= 0; i--) {
+    final previous = lignes[i].timecodeMs;
+    if (previous != null) return current < previous;
+  }
+  return false;
 }
 
 /// A `+` FAB that adds a line on a plain tap; long-pressing reveals a
@@ -186,12 +239,15 @@ String _formatDuration(Duration d) {
 }
 
 /// Parses a `mm:ss` or plain-seconds string into milliseconds, or null if
-/// [input] isn't a valid non-negative timecode.
+/// [input] isn't a valid non-negative timecode. In the `mm:ss` form, the
+/// seconds part must be a real seconds value (0-59): "00:90" is rejected
+/// rather than silently read as 90 seconds.
 int? _parseTimecode(String input) {
   final parts = input.trim().split(':');
   if (parts.isEmpty || parts.length > 2) return null;
   final numbers = parts.map(int.tryParse).toList();
   if (numbers.contains(null)) return null;
+  if (parts.length == 2 && (numbers[1]! < 0 || numbers[1]! > 59)) return null;
   final seconds = parts.length == 2
       ? numbers[0]! * 60 + numbers[1]!
       : numbers[0]!;
@@ -335,18 +391,21 @@ class _AudioSectionState extends ConsumerState<_AudioSection> {
 
 class _LigneTile extends ConsumerStatefulWidget {
   const _LigneTile({
-    required super.key,
     required this.ligne,
+    required this.index,
     required this.hasAudio,
-    required this.onDelete,
+    required this.showTimecode,
+    required this.isOutOfOrder,
     required this.onTexteChanged,
     required this.onLangueDetected,
     required this.onTimecodeChanged,
   });
 
   final Ligne ligne;
+  final int index;
   final bool hasAudio;
-  final VoidCallback onDelete;
+  final bool showTimecode;
+  final bool isOutOfOrder;
   final ValueChanged<String> onTexteChanged;
   final ValueChanged<String?> onLangueDetected;
   final ValueChanged<int?> onTimecodeChanged;
@@ -458,7 +517,10 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ListTile(
-          leading: const Icon(Icons.drag_handle),
+          leading: ReorderableDragStartListener(
+            index: widget.index,
+            child: const Icon(Icons.drag_handle),
+          ),
           title: TextField(
             controller: _textController,
             focusNode: _focusNode,
@@ -468,41 +530,51 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
           subtitle: widget.ligne.langueDetectee == null
               ? null
               : Text(widget.ligne.langueDetectee!.toUpperCase()),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 56,
-                child: TextField(
-                  key: ValueKey('timecode-${widget.ligne.id}'),
-                  controller: _timecodeController,
-                  focusNode: _timecodeFocusNode,
-                  textAlign: TextAlign.center,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [_TimecodeInputFormatter()],
-                  decoration: const InputDecoration(
-                    hintText: '--:--',
-                    border: InputBorder.none,
-                    isDense: true,
-                  ),
-                  onSubmitted: _commitTimecode,
-                  onTapOutside: (_) =>
-                      _commitTimecode(_timecodeController.text),
-                ),
-              ),
-              if (widget.hasAudio)
-                IconButton(
-                  icon: const Icon(Icons.flag_outlined, size: 20),
-                  tooltip: 'Mark at current playback time',
-                  visualDensity: VisualDensity.compact,
-                  onPressed: _markNow,
-                ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline),
-                onPressed: widget.onDelete,
-              ),
-            ],
-          ),
+          trailing: widget.showTimecode
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.isOutOfOrder)
+                      const Padding(
+                        padding: EdgeInsets.only(right: 4),
+                        child: Tooltip(
+                          message: 'Earlier than the previous line\'s timecode',
+                          child: Icon(
+                            Icons.warning_amber_rounded,
+                            size: 18,
+                            color: Colors.orange,
+                          ),
+                        ),
+                      ),
+                    SizedBox(
+                      width: 56,
+                      child: TextField(
+                        key: ValueKey('timecode-${widget.ligne.id}'),
+                        controller: _timecodeController,
+                        focusNode: _timecodeFocusNode,
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [_TimecodeInputFormatter()],
+                        decoration: const InputDecoration(
+                          hintText: '--:--',
+                          border: InputBorder.none,
+                          isDense: true,
+                        ),
+                        onSubmitted: _commitTimecode,
+                        onTapOutside: (_) =>
+                            _commitTimecode(_timecodeController.text),
+                      ),
+                    ),
+                    if (widget.hasAudio)
+                      IconButton(
+                        icon: const Icon(Icons.flag_outlined, size: 20),
+                        tooltip: 'Mark at current playback time',
+                        visualDensity: VisualDensity.compact,
+                        onPressed: _markNow,
+                      ),
+                  ],
+                )
+              : null,
         ),
         if (_isFocused && lastWord != null)
           RhymeSuggestionsPanel(
@@ -511,6 +583,20 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
             onSelect: _insertWord,
           ),
       ],
+    );
+  }
+}
+
+class _SwipeDeleteBackground extends StatelessWidget {
+  const _SwipeDeleteBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.red,
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: const Icon(Icons.delete_outline, color: Colors.white),
     );
   }
 }

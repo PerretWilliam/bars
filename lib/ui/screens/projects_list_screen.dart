@@ -9,6 +9,8 @@ import '../../data/app_database.dart';
 import '../../providers/lignes_provider.dart';
 import '../../providers/projets_provider.dart';
 
+const _languageEmoji = {'fr': '🇫🇷', 'en': '🇬🇧'};
+
 class ProjectsListScreen extends ConsumerWidget {
   const ProjectsListScreen({super.key});
 
@@ -236,33 +238,13 @@ class _ProjectCard extends ConsumerWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         title: Text(
-          projet.nom,
+          '${_languageEmoji[projet.langueParDefaut] ?? ''} ${projet.nom}',
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                margin: const EdgeInsets.only(top: 4),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  projet.langueParDefaut.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: colorScheme.onSecondaryContainer,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
             Text(
               preview ?? 'No lines yet',
               maxLines: 1,

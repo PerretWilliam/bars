@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../ui/screens/dictionaries_screen.dart';
 import '../ui/screens/new_project_screen.dart';
 import '../ui/screens/project_editor_screen.dart';
+import '../ui/screens/project_info_screen.dart';
 import '../ui/screens/projects_list_screen.dart';
 import '../ui/screens/rap_mode_screen.dart';
 
@@ -23,6 +24,11 @@ final appRouter = GoRouter(
       path: '/project/:id/rap',
       builder: (context, state) =>
           RapModeScreen(projetId: int.parse(state.pathParameters['id']!)),
+    ),
+    GoRoute(
+      path: '/project/:id/info',
+      builder: (context, state) =>
+          ProjectInfoScreen(projetId: int.parse(state.pathParameters['id']!)),
     ),
     GoRoute(
       path: '/dictionaries',

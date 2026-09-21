@@ -12,6 +12,13 @@ final projetsListProvider = StreamProvider<List<Projet>>((ref) {
   return db.select(db.projets).watch();
 });
 
+final projetProvider = StreamProvider.family<Projet?, int>((ref, projetId) {
+  final db = ref.watch(databaseProvider);
+  return (db.select(
+    db.projets,
+  )..where((row) => row.id.equals(projetId))).watchSingleOrNull();
+});
+
 class ProjetsController {
   ProjetsController(this._db);
 
@@ -23,6 +30,16 @@ class ProjetsController {
         .insert(
           ProjetsCompanion.insert(nom: nom, langueParDefaut: Value(langue)),
         );
+  }
+
+  Future<void> update({
+    required int id,
+    required String nom,
+    required String langue,
+  }) {
+    return (_db.update(_db.projets)..where((row) => row.id.equals(id))).write(
+      ProjetsCompanion(nom: Value(nom), langueParDefaut: Value(langue)),
+    );
   }
 
   /// Deletes a project's row (cascading its lines and audio row in the
