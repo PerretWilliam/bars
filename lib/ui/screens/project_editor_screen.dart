@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:just_audio/just_audio.dart';
@@ -178,6 +179,31 @@ int? _parseTimecode(String input) {
       : numbers[0]!;
   if (seconds < 0) return null;
   return seconds * 1000;
+}
+
+/// Live-formats digit entry into `mm:ss` as the user types (a numeric
+/// keypad has no `:` key), e.g. "1" "2" "3" "4" becomes "12:34".
+class _TimecodeInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final limited = digits.length > 4 ? digits.substring(0, 4) : digits;
+
+    final buffer = StringBuffer();
+    for (var i = 0; i < limited.length; i++) {
+      if (i == 2) buffer.write(':');
+      buffer.write(limited[i]);
+    }
+
+    final formatted = buffer.toString();
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
 }
 
 class _AudioSection extends ConsumerStatefulWidget {
@@ -430,10 +456,12 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
               SizedBox(
                 width: 56,
                 child: TextField(
+                  key: ValueKey('timecode-${widget.ligne.id}'),
                   controller: _timecodeController,
                   focusNode: _timecodeFocusNode,
                   textAlign: TextAlign.center,
                   keyboardType: TextInputType.number,
+                  inputFormatters: [_TimecodeInputFormatter()],
                   decoration: const InputDecoration(
                     hintText: '--:--',
                     border: InputBorder.none,
