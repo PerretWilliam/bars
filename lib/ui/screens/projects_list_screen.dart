@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/app_database.dart';
+import '../../providers/lignes_provider.dart';
 import '../../providers/projets_provider.dart';
 
 class ProjectsListScreen extends ConsumerWidget {
@@ -206,18 +207,26 @@ class _SwipeBackground extends StatelessWidget {
   }
 }
 
-class _ProjectCard extends StatelessWidget {
+class _ProjectCard extends ConsumerWidget {
   const _ProjectCard({required this.projet, required this.onTap});
 
   final Projet projet;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final initial = projet.nom.trim().isEmpty
-        ? '?'
-        : projet.nom.trim()[0].toUpperCase();
+    final lignesAsync = ref.watch(lignesForProjetProvider(projet.id));
+    final preview = lignesAsync.maybeWhen(
+      data: (lignes) {
+        final texts = lignes
+            .map((l) => l.texte.trim())
+            .where((t) => t.isNotEmpty)
+            .toList();
+        return texts.isEmpty ? null : texts.join('  ·  ');
+      },
+      orElse: () => null,
+    );
 
     return Card(
       elevation: 0,
@@ -226,36 +235,48 @@ class _ProjectCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        leading: CircleAvatar(
-          backgroundColor: colorScheme.primaryContainer,
-          foregroundColor: colorScheme.onPrimaryContainer,
-          child: Text(
-            initial,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
         title: Text(
           projet.nom,
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
-        subtitle: Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            margin: const EdgeInsets.only(top: 4),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: colorScheme.secondaryContainer,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              projet.langueParDefaut.toUpperCase(),
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: colorScheme.onSecondaryContainer,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                margin: const EdgeInsets.only(top: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: colorScheme.secondaryContainer,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  projet.langueParDefaut.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSecondaryContainer,
+                  ),
+                ),
               ),
             ),
-          ),
+            const SizedBox(height: 4),
+            Text(
+              preview ?? 'No lines yet',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: colorScheme.onSurfaceVariant.withValues(
+                  alpha: preview == null ? 0.6 : 1,
+                ),
+                fontStyle: preview == null
+                    ? FontStyle.italic
+                    : FontStyle.normal,
+              ),
+            ),
+          ],
         ),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
