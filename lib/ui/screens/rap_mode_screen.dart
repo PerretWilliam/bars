@@ -220,10 +220,7 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                     : ScrollablePositionedList.builder(
                         itemScrollController: _itemScrollController,
                         itemPositionsListener: _itemPositionsListener,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 96,
-                        ),
+                        padding: const EdgeInsets.fromLTRB(16, 140, 16, 96),
                         itemCount: lignes.length,
                         itemBuilder: (context, index) {
                           final ligne = lignes[index];
@@ -231,20 +228,8 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                           return GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () => _seekTo(ligne.timecodeMs),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 250),
-                              curve: Curves.easeOut,
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isCurrent
-                                    ? Colors.deepPurple.withValues(alpha: 0.35)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
                               child: AnimatedDefaultTextStyle(
                                 duration: const Duration(milliseconds: 250),
                                 curve: Curves.easeOut,
@@ -255,6 +240,25 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                                   fontSize: fontSize,
                                   fontWeight: FontWeight.w600,
                                   height: 1.4,
+                                  // A glow instead of a background pill, like
+                                  // a karaoke-style highlight (YouTube
+                                  // Music): shadows always present so the
+                                  // style interpolates smoothly, fading via
+                                  // alpha/blur rather than popping in.
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.deepPurpleAccent.withValues(
+                                        alpha: isCurrent ? 0.85 : 0,
+                                      ),
+                                      blurRadius: isCurrent ? 26 : 0,
+                                    ),
+                                    Shadow(
+                                      color: Colors.white.withValues(
+                                        alpha: isCurrent ? 0.55 : 0,
+                                      ),
+                                      blurRadius: isCurrent ? 14 : 0,
+                                    ),
+                                  ],
                                 ),
                                 child: Text(ligne.texte),
                               ),
