@@ -4,7 +4,7 @@ Guidance for Claude Code (and any contributor) working in this repository.
 
 ## Project
 
-Flutter app for writing rap lyrics, finding rhymes, and syncing lines to audio timecodes.
+**Bars** — a Flutter app for writing rap lyrics, finding rhymes, and syncing lines to audio timecodes.
 See [ROADMAP.md](ROADMAP.md) for the phased implementation plan.
 
 ## Language conventions

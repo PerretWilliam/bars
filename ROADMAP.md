@@ -1,4 +1,4 @@
-# Roadmap — Rap lyrics app (Flutter)
+# Roadmap — Bars (Flutter rap lyrics app)
 
 Policy: no manual implementation if a library already does it.
 

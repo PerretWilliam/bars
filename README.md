@@ -1,17 +1,17 @@
-# lyrics
+# Bars
 
-A new Flutter project.
+A Flutter app for writing rap lyrics, finding rhymes, and syncing lines to a beat.
 
-## Getting Started
+- **Notepad** — write and reorder lines, with live rhyme suggestions (French and English dictionaries) and per-line timecodes.
+- **Timecoded mode** — import an audio file and mark each line at its exact moment in the track.
+- **Rap mode** — a clean, full-screen, auto-scrolling display synced to playback, for the studio or the stage.
+- **Export/import** — package a project (lines, timecodes, audio) into a `.rapproj` bundle to back up or move between devices.
 
-This project is a starting point for a Flutter application.
+See [ROADMAP.md](ROADMAP.md) for the phased implementation plan and [CLAUDE.md](CLAUDE.md) for contributor guidance.
 
-A few resources to get you started if this is your first Flutter project:
+## Getting started
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter pub get
+flutter run
+```
