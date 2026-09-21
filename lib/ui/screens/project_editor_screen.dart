@@ -71,33 +71,6 @@ class ProjectEditorScreen extends ConsumerWidget {
             tooltip: 'Rap mode',
             onPressed: () => context.push('/project/$projetId/rap'),
           ),
-          PopupMenuButton<_MenuAction>(
-            tooltip: 'More',
-            onSelected: (action) {
-              switch (action) {
-                case _MenuAction.info:
-                  context.push('/project/$projetId/info');
-                case _MenuAction.export:
-                  _exportProject(ref);
-                case _MenuAction.dictionaries:
-                  context.push('/dictionaries');
-              }
-            },
-            itemBuilder: (context) => const [
-              PopupMenuItem(
-                value: _MenuAction.info,
-                child: Text('Project info'),
-              ),
-              PopupMenuItem(
-                value: _MenuAction.export,
-                child: Text('Export project'),
-              ),
-              PopupMenuItem(
-                value: _MenuAction.dictionaries,
-                child: Text('Rhyme dictionaries'),
-              ),
-            ],
-          ),
         ],
       ),
       body: Column(
@@ -158,12 +131,13 @@ class ProjectEditorScreen extends ConsumerWidget {
       floatingActionButton: _AddFab(
         onAddLine: () => _addLine(ref),
         onImportAudio: () => _importAudio(context, ref),
+        onProjectInfo: () => context.push('/project/$projetId/info'),
+        onExportProject: () => _exportProject(ref),
+        onDictionaries: () => context.push('/dictionaries'),
       ),
     );
   }
 }
-
-enum _MenuAction { info, export, dictionaries }
 
 /// Whether `lignes[index]`'s timecode is out of chronological order relative
 /// to the nearest preceding and following lines that have one set. Lines
@@ -179,13 +153,22 @@ bool _isOutOfOrder(List<Ligne> lignes, int index) {
   return false;
 }
 
-/// A `+` FAB that adds a line on a plain tap; long-pressing reveals a
-/// secondary mini-FAB for importing audio, Google Keep-style.
+/// A `+` FAB that adds a line on a plain tap; long-pressing reveals
+/// secondary mini-FABs for the project's other actions, Google Keep-style.
 class _AddFab extends StatefulWidget {
-  const _AddFab({required this.onAddLine, required this.onImportAudio});
+  const _AddFab({
+    required this.onAddLine,
+    required this.onImportAudio,
+    required this.onProjectInfo,
+    required this.onExportProject,
+    required this.onDictionaries,
+  });
 
   final VoidCallback onAddLine;
   final VoidCallback onImportAudio;
+  final VoidCallback onProjectInfo;
+  final VoidCallback onExportProject;
+  final VoidCallback onDictionaries;
 
   @override
   State<_AddFab> createState() => _AddFabState();
@@ -194,25 +177,58 @@ class _AddFab extends StatefulWidget {
 class _AddFabState extends State<_AddFab> {
   bool _expanded = false;
 
+  Widget _miniFab({
+    required String heroTag,
+    required String tooltip,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: FloatingActionButton.small(
+        heroTag: heroTag,
+        tooltip: tooltip,
+        onPressed: () {
+          setState(() => _expanded = false);
+          onPressed();
+        },
+        child: Icon(icon),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        if (_expanded)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: FloatingActionButton.small(
-              heroTag: 'importAudioFab',
-              tooltip: 'Import audio file',
-              onPressed: () {
-                setState(() => _expanded = false);
-                widget.onImportAudio();
-              },
-              child: const Icon(Icons.audio_file_outlined),
-            ),
+        if (_expanded) ...[
+          _miniFab(
+            heroTag: 'dictionariesFab',
+            tooltip: 'Rhyme dictionaries',
+            icon: Icons.menu_book_outlined,
+            onPressed: widget.onDictionaries,
           ),
+          _miniFab(
+            heroTag: 'exportProjectFab',
+            tooltip: 'Export project',
+            icon: Icons.ios_share,
+            onPressed: widget.onExportProject,
+          ),
+          _miniFab(
+            heroTag: 'projectInfoFab',
+            tooltip: 'Project info',
+            icon: Icons.info_outline,
+            onPressed: widget.onProjectInfo,
+          ),
+          _miniFab(
+            heroTag: 'importAudioFab',
+            tooltip: 'Import audio file',
+            icon: Icons.audio_file_outlined,
+            onPressed: widget.onImportAudio,
+          ),
+        ],
         GestureDetector(
           onLongPress: () => setState(() => _expanded = !_expanded),
           child: FloatingActionButton(
