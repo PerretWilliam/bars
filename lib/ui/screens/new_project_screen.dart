@@ -30,8 +30,9 @@ class _NewProjectScreenState extends ConsumerState<NewProjectScreen> {
 
     setState(() => _isSubmitting = true);
     try {
-      final createProjet = ref.read(createProjetProvider);
-      await createProjet(nom: _nameController.text.trim(), langue: _language);
+      await ref
+          .read(projetsControllerProvider)
+          .create(nom: _nameController.text.trim(), langue: _language);
       if (mounted) context.pop();
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
