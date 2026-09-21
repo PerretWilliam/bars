@@ -5,6 +5,21 @@ import '../data/app_database.dart';
 import '../services/audio_file_manager.dart';
 import 'database_provider.dart';
 
+/// The current playback position of whichever audio is loaded in the
+/// Notepad screen. Read on-demand (not watched) so per-line "mark now"
+/// actions can default to it without the lines list rebuilding on every
+/// position tick.
+class AudioPosition extends Notifier<Duration> {
+  @override
+  Duration build() => Duration.zero;
+
+  void set(Duration position) => state = position;
+}
+
+final audioPositionProvider = NotifierProvider<AudioPosition, Duration>(
+  AudioPosition.new,
+);
+
 /// A project has at most one active audio file: importing a new one
 /// replaces the previous row.
 final audioForProjetProvider = StreamProvider.family<Audio?, int>((
