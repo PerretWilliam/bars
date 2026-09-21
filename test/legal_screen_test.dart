@@ -4,7 +4,7 @@ import 'package:lyrics/l10n/app_localizations.dart';
 import 'package:lyrics/ui/screens/legal_screen.dart';
 
 void main() {
-  testWidgets('shows the placeholder legal text', (tester) async {
+  testWidgets('shows the legal sections', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: const LegalScreen(),
@@ -14,9 +14,8 @@ void main() {
     );
 
     expect(find.text('Legal'), findsOneWidget);
-    expect(
-      find.textContaining('placeholder', findRichText: true),
-      findsOneWidget,
-    );
+    expect(find.text('Publisher'), findsOneWidget);
+    expect(find.text('Personal data'), findsOneWidget);
+    expect(find.text('License'), findsOneWidget);
   });
 }

@@ -11,9 +11,49 @@ class LegalScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.legalTitle)),
-      body: Padding(
+      body: ListView(
         padding: const EdgeInsets.all(24),
-        child: Text(l10n.legalPlaceholderText),
+        children: [
+          _LegalSection(
+            title: l10n.legalPublisherTitle,
+            body: l10n.legalPublisherBody,
+          ),
+          _LegalSection(title: l10n.legalDataTitle, body: l10n.legalDataBody),
+          _LegalSection(
+            title: l10n.legalContentTitle,
+            body: l10n.legalContentBody,
+          ),
+          _LegalSection(
+            title: l10n.legalLicenseTitle,
+            body: l10n.legalLicenseBody,
+          ),
+          _LegalSection(
+            title: l10n.legalContactTitle,
+            body: l10n.legalContactBody,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LegalSection extends StatelessWidget {
+  const _LegalSection({required this.title, required this.body});
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 6),
+          Text(body),
+        ],
       ),
     );
   }

@@ -265,8 +265,35 @@
   "legalTitle": "Legal",
   "@legalTitle": {"description": "AppBar title on the Legal screen"},
 
-  "legalPlaceholderText": "This section is a placeholder. It will be replaced with the app's actual privacy policy and terms of use before a public release.",
-  "@legalPlaceholderText": {"description": "Body text of the Legal screen, until real legal text is written"},
+  "legalPublisherTitle": "Publisher",
+  "@legalPublisherTitle": {"description": "Legal screen section title"},
+
+  "legalPublisherBody": "Bars is developed and published by William Perret. You can reach out via the project's GitHub repository or william-perret.fr.",
+  "@legalPublisherBody": {"description": "Legal screen section body"},
+
+  "legalDataTitle": "Personal data",
+  "@legalDataTitle": {"description": "Legal screen section title"},
+
+  "legalDataBody": "Bars has no backend and no user accounts. Everything you create — projects, lyrics, timecodes, imported audio — stays stored locally on your device and is never sent to or stored on any server. The app doesn't use analytics, ads, or tracking of any kind.",
+  "@legalDataBody": {"description": "Legal screen section body"},
+
+  "legalContentTitle": "Your content",
+  "@legalContentTitle": {"description": "Legal screen section title"},
+
+  "legalContentBody": "Lyrics and projects you write remain entirely your own. You can export them as .rapproj files or delete them at any time; nothing is retained anywhere else.",
+  "@legalContentBody": {"description": "Legal screen section body"},
+
+  "legalLicenseTitle": "License",
+  "@legalLicenseTitle": {"description": "Legal screen section title"},
+
+  "legalLicenseBody": "Bars is open-source software released under the MIT license. Its source code is publicly available at github.com/PerretWilliam/bars.",
+  "@legalLicenseBody": {"description": "Legal screen section body"},
+
+  "legalContactTitle": "Contact",
+  "@legalContactTitle": {"description": "Legal screen section title"},
+
+  "legalContactBody": "For any question about this app, open an issue on GitHub or reach out via william-perret.fr.",
+  "@legalContactBody": {"description": "Legal screen section body"},
 
   "changelogTitle": "Changelog",
   "@changelogTitle": {"description": "AppBar title on the Changelog screen"},

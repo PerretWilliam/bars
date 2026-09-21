@@ -265,8 +265,39 @@ class AppLocalizationsFr extends AppLocalizations {
   String get legalTitle => 'Mentions légales';
 
   @override
-  String get legalPlaceholderText =>
-      'Cette section est un espace réservé. Elle sera remplacée par la vraie politique de confidentialité et les conditions d\'utilisation avant une publication publique.';
+  String get legalPublisherTitle => 'Éditeur';
+
+  @override
+  String get legalPublisherBody =>
+      'Bars est développée et publiée par William Perret. Tu peux me contacter via le dépôt GitHub du projet ou sur william-perret.fr.';
+
+  @override
+  String get legalDataTitle => 'Données personnelles';
+
+  @override
+  String get legalDataBody =>
+      'Bars n\'a ni backend ni compte utilisateur. Tout ce que tu crées — projets, paroles, timecodes, audio importé — reste stocké localement sur ton appareil et n\'est jamais envoyé ni stocké sur un serveur. L\'app n\'utilise ni analytics, ni publicité, ni traceur d\'aucune sorte.';
+
+  @override
+  String get legalContentTitle => 'Ton contenu';
+
+  @override
+  String get legalContentBody =>
+      'Les paroles et projets que tu écris restent entièrement les tiens. Tu peux les exporter sous forme de fichiers .rapproj ou les supprimer à tout moment ; rien n\'est conservé ailleurs.';
+
+  @override
+  String get legalLicenseTitle => 'Licence';
+
+  @override
+  String get legalLicenseBody =>
+      'Bars est un logiciel open source publié sous licence MIT. Son code source est disponible publiquement sur github.com/PerretWilliam/bars.';
+
+  @override
+  String get legalContactTitle => 'Contact';
+
+  @override
+  String get legalContactBody =>
+      'Pour toute question sur cette app, ouvre une issue sur GitHub ou contacte-moi via william-perret.fr.';
 
   @override
   String get changelogTitle => 'Historique des versions';

@@ -566,11 +566,65 @@ abstract class AppLocalizations {
   /// **'Legal'**
   String get legalTitle;
 
-  /// Body text of the Legal screen, until real legal text is written
+  /// Legal screen section title
   ///
   /// In en, this message translates to:
-  /// **'This section is a placeholder. It will be replaced with the app\'s actual privacy policy and terms of use before a public release.'**
-  String get legalPlaceholderText;
+  /// **'Publisher'**
+  String get legalPublisherTitle;
+
+  /// Legal screen section body
+  ///
+  /// In en, this message translates to:
+  /// **'Bars is developed and published by William Perret. You can reach out via the project\'s GitHub repository or william-perret.fr.'**
+  String get legalPublisherBody;
+
+  /// Legal screen section title
+  ///
+  /// In en, this message translates to:
+  /// **'Personal data'**
+  String get legalDataTitle;
+
+  /// Legal screen section body
+  ///
+  /// In en, this message translates to:
+  /// **'Bars has no backend and no user accounts. Everything you create — projects, lyrics, timecodes, imported audio — stays stored locally on your device and is never sent to or stored on any server. The app doesn\'t use analytics, ads, or tracking of any kind.'**
+  String get legalDataBody;
+
+  /// Legal screen section title
+  ///
+  /// In en, this message translates to:
+  /// **'Your content'**
+  String get legalContentTitle;
+
+  /// Legal screen section body
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrics and projects you write remain entirely your own. You can export them as .rapproj files or delete them at any time; nothing is retained anywhere else.'**
+  String get legalContentBody;
+
+  /// Legal screen section title
+  ///
+  /// In en, this message translates to:
+  /// **'License'**
+  String get legalLicenseTitle;
+
+  /// Legal screen section body
+  ///
+  /// In en, this message translates to:
+  /// **'Bars is open-source software released under the MIT license. Its source code is publicly available at github.com/PerretWilliam/bars.'**
+  String get legalLicenseBody;
+
+  /// Legal screen section title
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get legalContactTitle;
+
+  /// Legal screen section body
+  ///
+  /// In en, this message translates to:
+  /// **'For any question about this app, open an issue on GitHub or reach out via william-perret.fr.'**
+  String get legalContactBody;
 
   /// AppBar title on the Changelog screen
   ///
