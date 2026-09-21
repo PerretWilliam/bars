@@ -1013,17 +1013,328 @@ class AudiosCompanion extends UpdateCompanion<Audio> {
   }
 }
 
+class $RhymesTable extends Rhymes with TableInfo<$RhymesTable, Rhyme> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RhymesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _motMeta = const VerificationMeta('mot');
+  @override
+  late final GeneratedColumn<String> mot = GeneratedColumn<String>(
+    'mot',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _rimeKeyMeta = const VerificationMeta(
+    'rimeKey',
+  );
+  @override
+  late final GeneratedColumn<String> rimeKey = GeneratedColumn<String>(
+    'rime_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _langueMeta = const VerificationMeta('langue');
+  @override
+  late final GeneratedColumn<String> langue = GeneratedColumn<String>(
+    'langue',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, mot, rimeKey, langue];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'rhymes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Rhyme> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('mot')) {
+      context.handle(
+        _motMeta,
+        mot.isAcceptableOrUnknown(data['mot']!, _motMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_motMeta);
+    }
+    if (data.containsKey('rime_key')) {
+      context.handle(
+        _rimeKeyMeta,
+        rimeKey.isAcceptableOrUnknown(data['rime_key']!, _rimeKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_rimeKeyMeta);
+    }
+    if (data.containsKey('langue')) {
+      context.handle(
+        _langueMeta,
+        langue.isAcceptableOrUnknown(data['langue']!, _langueMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_langueMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {mot, rimeKey, langue},
+  ];
+  @override
+  Rhyme map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Rhyme(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      mot: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mot'],
+      )!,
+      rimeKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rime_key'],
+      )!,
+      langue: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}langue'],
+      )!,
+    );
+  }
+
+  @override
+  $RhymesTable createAlias(String alias) {
+    return $RhymesTable(attachedDatabase, alias);
+  }
+}
+
+class Rhyme extends DataClass implements Insertable<Rhyme> {
+  final int id;
+  final String mot;
+  final String rimeKey;
+  final String langue;
+  const Rhyme({
+    required this.id,
+    required this.mot,
+    required this.rimeKey,
+    required this.langue,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['mot'] = Variable<String>(mot);
+    map['rime_key'] = Variable<String>(rimeKey);
+    map['langue'] = Variable<String>(langue);
+    return map;
+  }
+
+  RhymesCompanion toCompanion(bool nullToAbsent) {
+    return RhymesCompanion(
+      id: Value(id),
+      mot: Value(mot),
+      rimeKey: Value(rimeKey),
+      langue: Value(langue),
+    );
+  }
+
+  factory Rhyme.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Rhyme(
+      id: serializer.fromJson<int>(json['id']),
+      mot: serializer.fromJson<String>(json['mot']),
+      rimeKey: serializer.fromJson<String>(json['rimeKey']),
+      langue: serializer.fromJson<String>(json['langue']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'mot': serializer.toJson<String>(mot),
+      'rimeKey': serializer.toJson<String>(rimeKey),
+      'langue': serializer.toJson<String>(langue),
+    };
+  }
+
+  Rhyme copyWith({int? id, String? mot, String? rimeKey, String? langue}) =>
+      Rhyme(
+        id: id ?? this.id,
+        mot: mot ?? this.mot,
+        rimeKey: rimeKey ?? this.rimeKey,
+        langue: langue ?? this.langue,
+      );
+  Rhyme copyWithCompanion(RhymesCompanion data) {
+    return Rhyme(
+      id: data.id.present ? data.id.value : this.id,
+      mot: data.mot.present ? data.mot.value : this.mot,
+      rimeKey: data.rimeKey.present ? data.rimeKey.value : this.rimeKey,
+      langue: data.langue.present ? data.langue.value : this.langue,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Rhyme(')
+          ..write('id: $id, ')
+          ..write('mot: $mot, ')
+          ..write('rimeKey: $rimeKey, ')
+          ..write('langue: $langue')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, mot, rimeKey, langue);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Rhyme &&
+          other.id == this.id &&
+          other.mot == this.mot &&
+          other.rimeKey == this.rimeKey &&
+          other.langue == this.langue);
+}
+
+class RhymesCompanion extends UpdateCompanion<Rhyme> {
+  final Value<int> id;
+  final Value<String> mot;
+  final Value<String> rimeKey;
+  final Value<String> langue;
+  const RhymesCompanion({
+    this.id = const Value.absent(),
+    this.mot = const Value.absent(),
+    this.rimeKey = const Value.absent(),
+    this.langue = const Value.absent(),
+  });
+  RhymesCompanion.insert({
+    this.id = const Value.absent(),
+    required String mot,
+    required String rimeKey,
+    required String langue,
+  }) : mot = Value(mot),
+       rimeKey = Value(rimeKey),
+       langue = Value(langue);
+  static Insertable<Rhyme> custom({
+    Expression<int>? id,
+    Expression<String>? mot,
+    Expression<String>? rimeKey,
+    Expression<String>? langue,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (mot != null) 'mot': mot,
+      if (rimeKey != null) 'rime_key': rimeKey,
+      if (langue != null) 'langue': langue,
+    });
+  }
+
+  RhymesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? mot,
+    Value<String>? rimeKey,
+    Value<String>? langue,
+  }) {
+    return RhymesCompanion(
+      id: id ?? this.id,
+      mot: mot ?? this.mot,
+      rimeKey: rimeKey ?? this.rimeKey,
+      langue: langue ?? this.langue,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (mot.present) {
+      map['mot'] = Variable<String>(mot.value);
+    }
+    if (rimeKey.present) {
+      map['rime_key'] = Variable<String>(rimeKey.value);
+    }
+    if (langue.present) {
+      map['langue'] = Variable<String>(langue.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RhymesCompanion(')
+          ..write('id: $id, ')
+          ..write('mot: $mot, ')
+          ..write('rimeKey: $rimeKey, ')
+          ..write('langue: $langue')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ProjetsTable projets = $ProjetsTable(this);
   late final $LignesTable lignes = $LignesTable(this);
   late final $AudiosTable audios = $AudiosTable(this);
+  late final $RhymesTable rhymes = $RhymesTable(this);
+  late final Index idxRhymesMot = Index(
+    'idx_rhymes_mot',
+    'CREATE INDEX idx_rhymes_mot ON rhymes (mot)',
+  );
+  late final Index idxRhymesRimeKey = Index(
+    'idx_rhymes_rime_key',
+    'CREATE INDEX idx_rhymes_rime_key ON rhymes (rime_key, langue)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [projets, lignes, audios];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    projets,
+    lignes,
+    audios,
+    rhymes,
+    idxRhymesMot,
+    idxRhymesRimeKey,
+  ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
     WritePropagation(
@@ -2017,6 +2328,182 @@ typedef $$AudiosTableProcessedTableManager =
       Audio,
       PrefetchHooks Function({bool projetId})
     >;
+typedef $$RhymesTableCreateCompanionBuilder = RhymesCompanion Function({
+  Value<int> id,
+  required String mot,
+  required String rimeKey,
+  required String langue,
+});
+typedef $$RhymesTableUpdateCompanionBuilder = RhymesCompanion Function({
+  Value<int> id,
+  Value<String> mot,
+  Value<String> rimeKey,
+  Value<String> langue,
+});
+
+class $$RhymesTableFilterComposer
+    extends Composer<_$AppDatabase, $RhymesTable> {
+  $$RhymesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mot => $composableBuilder(
+    column: $table.mot,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rimeKey => $composableBuilder(
+    column: $table.rimeKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get langue => $composableBuilder(
+    column: $table.langue,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$RhymesTableOrderingComposer
+    extends Composer<_$AppDatabase, $RhymesTable> {
+  $$RhymesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mot => $composableBuilder(
+    column: $table.mot,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rimeKey => $composableBuilder(
+    column: $table.rimeKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get langue => $composableBuilder(
+    column: $table.langue,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RhymesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RhymesTable> {
+  $$RhymesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get mot =>
+      $composableBuilder(column: $table.mot, builder: (column) => column);
+
+  GeneratedColumn<String> get rimeKey =>
+      $composableBuilder(column: $table.rimeKey, builder: (column) => column);
+
+  GeneratedColumn<String> get langue =>
+      $composableBuilder(column: $table.langue, builder: (column) => column);
+}
+
+class $$RhymesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RhymesTable,
+          Rhyme,
+          $$RhymesTableFilterComposer,
+          $$RhymesTableOrderingComposer,
+          $$RhymesTableAnnotationComposer,
+          $$RhymesTableCreateCompanionBuilder,
+          $$RhymesTableUpdateCompanionBuilder,
+          (Rhyme, BaseReferences<_$AppDatabase, $RhymesTable, Rhyme>),
+          Rhyme,
+          PrefetchHooks Function()
+        > {
+  $$RhymesTableTableManager(_$AppDatabase db, $RhymesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RhymesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RhymesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RhymesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> mot = const Value.absent(),
+                Value<String> rimeKey = const Value.absent(),
+                Value<String> langue = const Value.absent(),
+              }) => RhymesCompanion(
+                id: id,
+                mot: mot,
+                rimeKey: rimeKey,
+                langue: langue,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String mot,
+                required String rimeKey,
+                required String langue,
+              }) => RhymesCompanion.insert(
+                id: id,
+                mot: mot,
+                rimeKey: rimeKey,
+                langue: langue,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$RhymesTable, Rhyme>(table),
+                  BaseReferences<_$AppDatabase, $RhymesTable, Rhyme>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RhymesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RhymesTable,
+      Rhyme,
+      $$RhymesTableFilterComposer,
+      $$RhymesTableOrderingComposer,
+      $$RhymesTableAnnotationComposer,
+      $$RhymesTableCreateCompanionBuilder,
+      $$RhymesTableUpdateCompanionBuilder,
+      (Rhyme, BaseReferences<_$AppDatabase, $RhymesTable, Rhyme>),
+      Rhyme,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2027,4 +2514,6 @@ class $AppDatabaseManager {
       $$LignesTableTableManager(_db, _db.lignes);
   $$AudiosTableTableManager get audios =>
       $$AudiosTableTableManager(_db, _db.audios);
+  $$RhymesTableTableManager get rhymes =>
+      $$RhymesTableTableManager(_db, _db.rhymes);
 }

@@ -28,14 +28,45 @@ class Audios extends Table {
   IntColumn get dureeMs => integer()();
 }
 
-@DriftDatabase(tables: [Projets, Lignes, Audios])
+@TableIndex(name: 'idx_rhymes_mot', columns: {#mot})
+@TableIndex(name: 'idx_rhymes_rime_key', columns: {#rimeKey, #langue})
+class Rhymes extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get mot => text()();
+  TextColumn get rimeKey => text()();
+  TextColumn get langue => text()();
+
+  @override
+  List<Set<Column>> get uniqueKeys => [
+    {mot, rimeKey, langue},
+  ];
+}
+
+@DriftDatabase(tables: [Projets, Lignes, Audios, Rhymes])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   AppDatabase.forTesting(super.connection);
 
+  // Rhymes queries filter by mot or by (rimeKey, langue) against a
+  // 100k+ row table; without indices those scans are slow enough to lose
+  // the race with Riverpod's default provider auto-disposal.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 3;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(rhymes);
+      }
+      if (from < 3) {
+        await m.createIndex(idxRhymesMot);
+        await m.createIndex(idxRhymesRimeKey);
+      }
+    },
+  );
 }
 
 QueryExecutor _openConnection() {
