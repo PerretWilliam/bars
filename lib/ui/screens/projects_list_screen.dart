@@ -25,6 +25,7 @@ class ProjectsListScreen extends ConsumerWidget {
               return ListTile(
                 title: Text(projet.nom),
                 subtitle: Text(projet.langueParDefaut.toUpperCase()),
+                onTap: () => context.push('/project/${projet.id}'),
               );
             },
           );
