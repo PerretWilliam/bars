@@ -1,0 +1,16 @@
+<svg viewBox="0 0 2736 650" xmlns="http://www.w3.org/2000/svg">
+  <rect width="2736" height="650" fill="#673AB7"/>
+
+  <!-- Bars mark -->
+  <rect x="260" y="340" width="90" height="180" rx="45" fill="#FFFFFF"/>
+  <rect x="380" y="220" width="90" height="300" rx="45" fill="#FFFFFF"/>
+  <rect x="500" y="280" width="90" height="240" rx="45" fill="#FFFFFF"/>
+
+  <!-- Wordmark -->
+  <text x="660" y="400" font-family="Arial, Helvetica, sans-serif" font-weight="700"
+        font-size="180" fill="#FFFFFF">Bars</text>
+
+  <!-- Tagline -->
+  <text x="664" y="470" font-family="Arial, Helvetica, sans-serif" font-weight="400"
+        font-size="46" fill="#E8DFF7">Write rap lyrics. Find rhymes. Sync to the beat.</text>
+</svg>
