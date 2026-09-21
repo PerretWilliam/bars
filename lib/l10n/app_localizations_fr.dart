@@ -291,4 +291,28 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get buyMeACoffeeButtonLabel => 'M\'offrir un café';
+
+  @override
+  String get changelog100Notepad =>
+      'Écris, réordonne et supprime des lignes, avec des suggestions de rimes en direct en français et en anglais';
+
+  @override
+  String get changelog100Timecoded =>
+      'Mode timecode : importe un fichier audio et marque chaque ligne à son instant exact dans le morceau';
+
+  @override
+  String get changelog100RapMode =>
+      'Mode rap : un affichage plein écran à défilement automatique synchronisé sur la lecture';
+
+  @override
+  String get changelog100ExportImport =>
+      'Exporte et importe des projets sous forme de bundles .rapproj';
+
+  @override
+  String get changelog100ThemeAndIcons =>
+      'Thème clair et sombre, un jeu d\'icônes complet, et une interface traduite en français et en anglais';
+
+  @override
+  String get changelog100FoldersAndInfo =>
+      'Dossiers, affichage en liste ou en grille, et pages d\'infos, mentions légales et don';
 }

@@ -31,7 +31,7 @@ class ChangelogScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 const SizedBox(height: 8),
-                for (final change in entry.changes)
+                for (final change in entry.changes(l10n))
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Row(

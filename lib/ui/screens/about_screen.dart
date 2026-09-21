@@ -1,10 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/app_localizations.dart';
+
+/// An IconButton-sized brand logo, tinted to match the icon theme so it
+/// still adapts to light/dark like the surrounding Lucide icons.
+class _BrandIconButton extends StatelessWidget {
+  const _BrandIconButton({
+    required this.assetPath,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final String assetPath;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: SvgPicture.asset(
+        assetPath,
+        width: 24,
+        height: 24,
+        colorFilter: ColorFilter.mode(
+          IconTheme.of(context).color!,
+          BlendMode.srcIn,
+        ),
+      ),
+      tooltip: tooltip,
+      onPressed: onPressed,
+    );
+  }
+}
 
 const _authorWebsiteUrl = 'https://william-perret.fr';
 const _githubUrl = 'https://github.com/PerretWilliam/bars';
@@ -63,13 +95,13 @@ class AboutScreen extends StatelessWidget {
                       tooltip: l10n.authorWebsiteTooltip,
                       onPressed: () => _openUrl(_authorWebsiteUrl),
                     ),
-                    IconButton(
-                      icon: const Icon(LucideIcons.code),
+                    _BrandIconButton(
+                      assetPath: 'assets/brand/github.svg',
                       tooltip: l10n.githubTooltip,
                       onPressed: () => _openUrl(_githubUrl),
                     ),
-                    IconButton(
-                      icon: const Icon(LucideIcons.coffee),
+                    _BrandIconButton(
+                      assetPath: 'assets/brand/buymeacoffee.svg',
                       tooltip: l10n.buyMeACoffeeTooltip,
                       onPressed: () => _openUrl(_buyMeACoffeeUrl),
                     ),

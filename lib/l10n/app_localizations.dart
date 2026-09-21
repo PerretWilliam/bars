@@ -613,6 +613,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Buy me a coffee'**
   String get buyMeACoffeeButtonLabel;
+
+  /// Changelog bullet for version 1.0.0
+  ///
+  /// In en, this message translates to:
+  /// **'Write, reorder, and delete lyric lines, with live rhyme suggestions in French and English'**
+  String get changelog100Notepad;
+
+  /// Changelog bullet for version 1.0.0
+  ///
+  /// In en, this message translates to:
+  /// **'Timecoded mode: import an audio file and mark each line at its exact moment in the track'**
+  String get changelog100Timecoded;
+
+  /// Changelog bullet for version 1.0.0
+  ///
+  /// In en, this message translates to:
+  /// **'Rap mode: a full-screen, auto-scrolling display synced to playback'**
+  String get changelog100RapMode;
+
+  /// Changelog bullet for version 1.0.0
+  ///
+  /// In en, this message translates to:
+  /// **'Export and import projects as .rapproj bundles'**
+  String get changelog100ExportImport;
+
+  /// Changelog bullet for version 1.0.0
+  ///
+  /// In en, this message translates to:
+  /// **'Light and dark theme, a full icon set, and a French/English localized UI'**
+  String get changelog100ThemeAndIcons;
+
+  /// Changelog bullet for version 1.0.0
+  ///
+  /// In en, this message translates to:
+  /// **'Folders, a list/grid view toggle, and app info/legal/donate pages'**
+  String get changelog100FoldersAndInfo;
 }
 
 class _AppLocalizationsDelegate

@@ -293,5 +293,23 @@
   },
 
   "buyMeACoffeeButtonLabel": "Buy me a coffee",
-  "@buyMeACoffeeButtonLabel": {"description": "Button label linking to Buy Me a Coffee"}
+  "@buyMeACoffeeButtonLabel": {"description": "Button label linking to Buy Me a Coffee"},
+
+  "changelog100Notepad": "Write, reorder, and delete lyric lines, with live rhyme suggestions in French and English",
+  "@changelog100Notepad": {"description": "Changelog bullet for version 1.0.0"},
+
+  "changelog100Timecoded": "Timecoded mode: import an audio file and mark each line at its exact moment in the track",
+  "@changelog100Timecoded": {"description": "Changelog bullet for version 1.0.0"},
+
+  "changelog100RapMode": "Rap mode: a full-screen, auto-scrolling display synced to playback",
+  "@changelog100RapMode": {"description": "Changelog bullet for version 1.0.0"},
+
+  "changelog100ExportImport": "Export and import projects as .rapproj bundles",
+  "@changelog100ExportImport": {"description": "Changelog bullet for version 1.0.0"},
+
+  "changelog100ThemeAndIcons": "Light and dark theme, a full icon set, and a French/English localized UI",
+  "@changelog100ThemeAndIcons": {"description": "Changelog bullet for version 1.0.0"},
+
+  "changelog100FoldersAndInfo": "Folders, a list/grid view toggle, and app info/legal/donate pages",
+  "@changelog100FoldersAndInfo": {"description": "Changelog bullet for version 1.0.0"}
 }

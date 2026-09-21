@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/donation_config.dart';
@@ -48,7 +48,15 @@ class DonateScreen extends StatelessWidget {
                 Uri.parse(_buyMeACoffeeUrl),
                 mode: LaunchMode.externalApplication,
               ),
-              icon: const Icon(LucideIcons.coffee),
+              icon: SvgPicture.asset(
+                'assets/brand/buymeacoffee.svg',
+                width: 20,
+                height: 20,
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).colorScheme.onPrimary,
+                  BlendMode.srcIn,
+                ),
+              ),
               label: Text(l10n.buyMeACoffeeButtonLabel),
             ),
           ),

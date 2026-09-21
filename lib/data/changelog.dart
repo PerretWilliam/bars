@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+
 class ChangelogEntry {
   const ChangelogEntry({
     required this.version,
@@ -7,23 +9,26 @@ class ChangelogEntry {
 
   final String version;
   final DateTime date;
-  final List<String> changes;
+
+  /// Localized bullet points for this entry.
+  final List<String> Function(AppLocalizations l10n) changes;
 }
 
 /// Hand-maintained release notes, newest first. Add an entry here whenever
 /// `pubspec.yaml`'s `version:` is bumped for a new build, per CLAUDE.md's
-/// workflow conventions.
+/// workflow conventions — the bullet points are localized, so add a key to
+/// both `app_en.arb` and `app_fr.arb` for each one.
 final changelog = [
   ChangelogEntry(
     version: '1.0.0',
     date: DateTime(2026, 9, 21),
-    changes: const [
-      'Write, reorder, and delete lyric lines, with live rhyme suggestions in French and English',
-      'Timecoded mode: import an audio file and mark each line at its exact moment in the track',
-      'Rap mode: a full-screen, auto-scrolling display synced to playback',
-      'Export and import projects as .rapproj bundles',
-      'Light and dark theme, a full icon set, and a French/English localized UI',
-      'Folders, a list/grid view toggle, and app info/legal/donate pages',
+    changes: (l10n) => [
+      l10n.changelog100Notepad,
+      l10n.changelog100Timecoded,
+      l10n.changelog100RapMode,
+      l10n.changelog100ExportImport,
+      l10n.changelog100ThemeAndIcons,
+      l10n.changelog100FoldersAndInfo,
     ],
   ),
 ];

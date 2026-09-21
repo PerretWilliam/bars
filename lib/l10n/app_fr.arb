@@ -86,5 +86,11 @@
   "googleGoalLabel": "Inscription Google Play (unique)",
   "appleGoalLabel": "Apple Developer Program (annuel)",
   "donateAmountLabel": "{raised} € / {goal} €",
-  "buyMeACoffeeButtonLabel": "M'offrir un café"
+  "buyMeACoffeeButtonLabel": "M'offrir un café",
+  "changelog100Notepad": "Écris, réordonne et supprime des lignes, avec des suggestions de rimes en direct en français et en anglais",
+  "changelog100Timecoded": "Mode timecode : importe un fichier audio et marque chaque ligne à son instant exact dans le morceau",
+  "changelog100RapMode": "Mode rap : un affichage plein écran à défilement automatique synchronisé sur la lecture",
+  "changelog100ExportImport": "Exporte et importe des projets sous forme de bundles .rapproj",
+  "changelog100ThemeAndIcons": "Thème clair et sombre, un jeu d'icônes complet, et une interface traduite en français et en anglais",
+  "changelog100FoldersAndInfo": "Dossiers, affichage en liste ou en grille, et pages d'infos, mentions légales et don"
 }

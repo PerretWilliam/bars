@@ -285,4 +285,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get buyMeACoffeeButtonLabel => 'Buy me a coffee';
+
+  @override
+  String get changelog100Notepad =>
+      'Write, reorder, and delete lyric lines, with live rhyme suggestions in French and English';
+
+  @override
+  String get changelog100Timecoded =>
+      'Timecoded mode: import an audio file and mark each line at its exact moment in the track';
+
+  @override
+  String get changelog100RapMode =>
+      'Rap mode: a full-screen, auto-scrolling display synced to playback';
+
+  @override
+  String get changelog100ExportImport =>
+      'Export and import projects as .rapproj bundles';
+
+  @override
+  String get changelog100ThemeAndIcons =>
+      'Light and dark theme, a full icon set, and a French/English localized UI';
+
+  @override
+  String get changelog100FoldersAndInfo =>
+      'Folders, a list/grid view toggle, and app info/legal/donate pages';
 }
