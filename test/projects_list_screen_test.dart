@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lyrics/data/app_database.dart';
+import 'package:lyrics/l10n/app_localizations.dart';
 import 'package:lyrics/providers/lignes_provider.dart';
 import 'package:lyrics/providers/projets_provider.dart';
 import 'package:lyrics/ui/screens/projects_list_screen.dart';
@@ -16,7 +17,11 @@ void main() {
         overrides: [
           projetsListProvider.overrideWith((ref) => Stream.value(<Projet>[])),
         ],
-        child: const MaterialApp(home: ProjectsListScreen()),
+        child: MaterialApp(
+          home: const ProjectsListScreen(),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pump();
@@ -47,7 +52,11 @@ void main() {
             lignesForProjetProvider(1)
                 .overrideWith((ref) => Stream.value(<Ligne>[])),
           ],
-          child: const MaterialApp(home: ProjectsListScreen()),
+          child: MaterialApp(
+            home: const ProjectsListScreen(),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+          ),
         ),
       );
       await tester.pump();

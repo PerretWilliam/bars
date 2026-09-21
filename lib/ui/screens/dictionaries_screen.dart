@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/dictionaries_provider.dart';
 import '../../services/dictionary_source.dart';
 
@@ -9,17 +10,18 @@ class DictionariesScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Rhyme dictionaries')),
+      appBar: AppBar(title: Text(l10n.rhymeDictionariesTitle)),
       body: ListView(
-        children: const [
+        children: [
           _DictionaryTile(
             language: DictionaryLanguage.fr,
-            title: 'French (Lexique)',
+            title: l10n.frenchDictionaryTitle,
           ),
           _DictionaryTile(
             language: DictionaryLanguage.en,
-            title: 'English (CMU)',
+            title: l10n.englishDictionaryTitle,
           ),
         ],
       ),
@@ -49,6 +51,7 @@ class _DictionaryTileState extends ConsumerState<_DictionaryTile> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final importedAsync = ref.watch(
       dictionaryImportedProvider(widget.language),
     );
@@ -59,18 +62,23 @@ class _DictionaryTileState extends ConsumerState<_DictionaryTile> {
       subtitle = switch (progress.phase) {
         DictionaryImportPhase.downloading =>
           progress.fraction != null
-              ? 'Downloading… ${(progress.fraction! * 100).toStringAsFixed(0)}%'
-              : 'Downloading…',
-        DictionaryImportPhase.importing => 'Importing into the database…',
-        DictionaryImportPhase.error => 'Failed: ${progress.errorMessage}',
+              ? l10n.dictionaryDownloadingProgressMessage(
+                  (progress.fraction! * 100).round(),
+                )
+              : l10n.dictionaryDownloadingMessage,
+        DictionaryImportPhase.importing => l10n.dictionaryImportingMessage,
+        DictionaryImportPhase.error => l10n.dictionaryFailedMessage(
+          '${progress.errorMessage}',
+        ),
         DictionaryImportPhase.done => '',
       };
     } else {
       subtitle = importedAsync.when(
-        data: (imported) =>
-            imported ? 'Downloaded — available offline' : 'Not downloaded',
-        loading: () => 'Checking…',
-        error: (error, stackTrace) => 'Something went wrong: $error',
+        data: (imported) => imported
+            ? l10n.dictionaryDownloadedMessage
+            : l10n.dictionaryNotDownloadedMessage,
+        loading: () => l10n.dictionaryCheckingMessage,
+        error: (error, stackTrace) => l10n.errorGenericMessage('$error'),
       );
     }
 
@@ -90,7 +98,7 @@ class _DictionaryTileState extends ConsumerState<_DictionaryTile> {
             )
           : FilledButton(
               onPressed: _startImport,
-              child: const Text('Download'),
+              child: Text(l10n.downloadButton),
             ),
     );
   }

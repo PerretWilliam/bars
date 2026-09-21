@@ -11,6 +11,7 @@ import 'package:just_waveform/just_waveform.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/app_database.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/audio_provider.dart';
 import '../../providers/lignes_provider.dart';
 import '../../providers/notepad_provider.dart';
@@ -38,8 +39,11 @@ class ProjectEditorScreen extends ConsumerWidget {
     final path = files.single.path;
     if (path == null) return;
     if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Importing audio…')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.importingAudioMessage),
+        ),
+      );
     }
     await ref.read(audioControllerProvider).importAudio(projetId, path);
   }
@@ -59,6 +63,7 @@ class ProjectEditorScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final lignesAsync = ref.watch(lignesForProjetProvider(projetId));
     final audio = ref.watch(audioForProjetProvider(projetId)).value;
     final controller = ref.read(lignesControllerProvider);
@@ -67,17 +72,19 @@ class ProjectEditorScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notepad'),
+        title: Text(l10n.notepadTitle),
         actions: [
           IconButton(
             icon: Icon(showTimecode ? LucideIcons.eye : LucideIcons.eye_off),
-            tooltip: showTimecode ? 'Hide timecodes' : 'Show timecodes',
+            tooltip: showTimecode
+                ? l10n.hideTimecodesTooltip
+                : l10n.showTimecodesTooltip,
             onPressed: () =>
                 ref.read(timecodeVisibleProvider.notifier).toggle(),
           ),
           IconButton(
             icon: const Icon(LucideIcons.play),
-            tooltip: 'Rap mode',
+            tooltip: l10n.rapModeTooltip,
             onPressed: () => context.push('/project/$projetId/rap'),
           ),
         ],
@@ -89,9 +96,7 @@ class ProjectEditorScreen extends ConsumerWidget {
             child: lignesAsync.when(
               data: (lignes) {
                 if (lignes.isEmpty) {
-                  return const Center(
-                    child: Text('No lines yet. Tap + to start.'),
-                  );
+                  return Center(child: Text(l10n.noLinesYetEditorMessage));
                 }
                 return ReorderableListView.builder(
                   physics: const ClampingScrollPhysics(),
@@ -132,7 +137,7 @@ class ProjectEditorScreen extends ConsumerWidget {
               },
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stackTrace) =>
-                  Center(child: Text('Something went wrong: $error')),
+                  Center(child: Text(l10n.errorGenericMessage('$error'))),
             ),
           ),
         ],
@@ -236,6 +241,7 @@ class _AddFabState extends State<_AddFab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -244,31 +250,31 @@ class _AddFabState extends State<_AddFab> {
           if (widget.onOpenProd case final onOpenProd?)
             _miniFab(
               heroTag: 'openProdFab',
-              label: 'Open prod',
+              label: l10n.openProdLabel,
               icon: LucideIcons.link,
               onPressed: onOpenProd,
             ),
           _miniFab(
             heroTag: 'dictionariesFab',
-            label: 'Rhyme dictionaries',
+            label: l10n.rhymeDictionariesTitle,
             icon: LucideIcons.book_open,
             onPressed: widget.onDictionaries,
           ),
           _miniFab(
             heroTag: 'exportProjectFab',
-            label: 'Export project',
+            label: l10n.exportProjectLabel,
             icon: LucideIcons.share_2,
             onPressed: widget.onExportProject,
           ),
           _miniFab(
             heroTag: 'projectInfoFab',
-            label: 'Project info',
+            label: l10n.projectInfoTitle,
             icon: LucideIcons.info,
             onPressed: widget.onProjectInfo,
           ),
           _miniFab(
             heroTag: 'importAudioFab',
-            label: 'Import audio file',
+            label: l10n.importAudioFileLabel,
             icon: LucideIcons.file_music,
             onPressed: widget.onImportAudio,
           ),
@@ -437,7 +443,7 @@ class _AudioSectionState extends ConsumerState<_AudioSection> {
               const SizedBox(width: 12),
               IconButton(
                 icon: const Icon(LucideIcons.trash),
-                tooltip: 'Remove audio',
+                tooltip: AppLocalizations.of(context)!.removeAudioTooltip,
                 onPressed: _removeAudio,
               ),
             ],
@@ -571,6 +577,7 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final lastWord = _lastWord;
 
     return Column(
@@ -597,11 +604,11 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (widget.isOutOfOrder)
-                      const Padding(
-                        padding: EdgeInsets.only(right: 4),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 4),
                         child: Tooltip(
-                          message: 'Earlier than the previous line\'s timecode',
-                          child: Icon(
+                          message: l10n.timecodeOutOfOrderTooltip,
+                          child: const Icon(
                             LucideIcons.triangle_alert,
                             size: 18,
                             color: Colors.orange,
@@ -617,8 +624,8 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
                         textAlign: TextAlign.center,
                         keyboardType: TextInputType.number,
                         inputFormatters: [_TimecodeInputFormatter()],
-                        decoration: const InputDecoration(
-                          hintText: '--:--',
+                        decoration: InputDecoration(
+                          hintText: l10n.timecodeHint,
                           border: InputBorder.none,
                           isDense: true,
                         ),
@@ -630,7 +637,7 @@ class _LigneTileState extends ConsumerState<_LigneTile> {
                     if (widget.hasAudio)
                       IconButton(
                         icon: const Icon(LucideIcons.flag, size: 20),
-                        tooltip: 'Mark at current playback time',
+                        tooltip: l10n.markCurrentTimeTooltip,
                         visualDensity: VisualDensity.compact,
                         onPressed: _markNow,
                       ),

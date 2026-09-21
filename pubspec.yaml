@@ -30,6 +30,9 @@ dependencies:
   wakelock_plus: ^1.8.0
   url_launcher: ^6.3.2
   flutter_lucide: ^1.47.0
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.3
 
 dev_dependencies:
   flutter_test:
@@ -46,6 +49,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
 
 flutter_launcher_icons:
   image_path: "assets/icon/icon.png"

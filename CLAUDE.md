@@ -10,8 +10,11 @@ See [ROADMAP.md](ROADMAP.md) for the phased implementation plan.
 ## Language conventions
 
 - **All code, identifiers, comments, commit messages, and code-review notes are in English.** No French in source files, even though the product owner communicates in French.
-- **The app UI itself ships in English only for now.** Do not add localization (`flutter_localizations`, `.arb` files, `intl`) until a phase explicitly asks for it — French/other translations come later as a dedicated pass, not incrementally.
-- Exception: linguistic *data* the app processes (French rhyme dictionary, detected line language, user lyrics content) is naturally French/English/whatever the user writes — that's content, not UI or code.
+- **The app UI is localized** via `flutter_localizations` + `intl` + ARB files, currently shipping English and French. Every user-facing string in `lib/ui/**` must go through `AppLocalizations`, not a string literal.
+  - Add a string: add the key to `lib/l10n/app_en.arb` (with an `@key` description), add the same key to every other `lib/l10n/app_<code>.arb`, then run `flutter gen-l10n` (or `flutter pub get`, since `generate: true` triggers it) to regenerate `lib/l10n/app_localizations*.dart`. Use it via `AppLocalizations.of(context)!.yourKey`.
+  - Add a language: create `lib/l10n/app_<code>.arb` with the same keys as `app_en.arb`, translated. No other wiring needed — `AppLocalizations.supportedLocales` picks it up automatically.
+  - The generated `lib/l10n/app_localizations*.dart` files are committed, like other generated code in this repo (`.g.dart`, `.freezed.dart`) — don't hand-edit them, don't gitignore them.
+- Exception: linguistic *data* the app processes (French rhyme dictionary, detected line language, user lyrics content) is naturally French/English/whatever the user writes — that's content, not UI or code, and stays out of the ARB files.
 
 ## Core policy (from ROADMAP.md)
 

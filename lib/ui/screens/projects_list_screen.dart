@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/app_database.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/lignes_provider.dart';
 import '../../providers/projets_provider.dart';
 
@@ -25,8 +26,11 @@ class ProjectsListScreen extends ConsumerWidget {
     if (path == null) return;
 
     if (context.mounted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Importing project…')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.importingProjectMessage),
+        ),
+      );
     }
     await ref.read(projectBundleServiceProvider).importBundle(File(path));
   }
@@ -36,21 +40,20 @@ class ProjectsListScreen extends ConsumerWidget {
     WidgetRef ref,
     Projet projet,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete project?'),
-        content: Text(
-          'This permanently deletes "${projet.nom}", its lines, and its audio file.',
-        ),
+        title: Text(l10n.deleteProjectDialogTitle),
+        content: Text(l10n.deleteProjectDialogBody(projet.nom)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancelButton),
           ),
           FilledButton.tonal(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(l10n.deleteButton),
           ),
         ],
       ),
@@ -75,8 +78,10 @@ class ProjectsListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final projetsAsync = ref.watch(projetsListProvider);
 
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('My projects')),
+      appBar: AppBar(title: Text(l10n.projectsListTitle)),
       body: projetsAsync.when(
         data: (projets) {
           if (projets.isEmpty) {
@@ -126,7 +131,7 @@ class ProjectsListScreen extends ConsumerWidget {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) =>
-            Center(child: Text('Something went wrong: $error')),
+            Center(child: Text(l10n.errorGenericMessage('$error'))),
       ),
       floatingActionButton: _NewProjectFab(
         onNewProject: () => context.push('/new'),
@@ -165,7 +170,7 @@ class _NewProjectFabState extends State<_NewProjectFab> {
             padding: const EdgeInsets.only(bottom: 12),
             child: FloatingActionButton.small(
               heroTag: 'importProjectFab',
-              tooltip: 'Import project',
+              tooltip: AppLocalizations.of(context)!.importProjectTooltip,
               onPressed: () {
                 setState(() => _expanded = false);
                 widget.onImportProject();
@@ -222,6 +227,7 @@ class _ProjectCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final lignesAsync = ref.watch(lignesForProjetProvider(projet.id));
     final preview = lignesAsync.maybeWhen(
@@ -251,7 +257,7 @@ class _ProjectCard extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              preview ?? 'No lines yet',
+              preview ?? l10n.noLinesYetPreview,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -277,6 +283,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -286,14 +293,11 @@ class _EmptyState extends StatelessWidget {
             const Icon(LucideIcons.mic, size: 64),
             const SizedBox(height: 16),
             Text(
-              'No projects yet',
+              l10n.noProjectsYetTitle,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Tap the + button to start writing your first track.',
-              textAlign: TextAlign.center,
-            ),
+            Text(l10n.noProjectsYetBody, textAlign: TextAlign.center),
           ],
         ),
       ),

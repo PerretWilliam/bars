@@ -9,6 +9,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../data/app_database.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers/audio_provider.dart';
 import '../../providers/lignes_provider.dart';
 import '../../providers/rap_mode_provider.dart';
@@ -193,6 +194,7 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final lignesAsync = ref.watch(lignesForProjetProvider(widget.projetId));
     final audio = ref.watch(audioForProjetProvider(widget.projetId)).value;
     final subMode = ref.watch(rapModeSubModeProvider);
@@ -212,10 +214,10 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
             Positioned.fill(
               child: lignesAsync.when(
                 data: (lignes) => lignes.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
-                          'No lines yet',
-                          style: TextStyle(color: Colors.white54),
+                          l10n.noLinesYetPreview,
+                          style: const TextStyle(color: Colors.white54),
                         ),
                       )
                     : ScrollablePositionedList.builder(
@@ -270,7 +272,7 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stackTrace) => Center(
                   child: Text(
-                    'Something went wrong: $error',
+                    l10n.errorGenericMessage('$error'),
                     style: const TextStyle(color: Colors.white54),
                   ),
                 ),
@@ -327,6 +329,7 @@ class _RapModeControls extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -344,9 +347,7 @@ class _RapModeControls extends ConsumerWidget {
                   LucideIcons.repeat,
                   color: loop ? Colors.deepPurpleAccent : Colors.white,
                 ),
-                tooltip: loop
-                    ? 'Loop on (tap to disable)'
-                    : 'Loop off (tap to enable)',
+                tooltip: loop ? l10n.loopOnTooltip : l10n.loopOffTooltip,
                 onPressed: onToggleLoop,
               ),
               IconButton(
@@ -367,8 +368,8 @@ class _RapModeControls extends ConsumerWidget {
                   color: Colors.white,
                 ),
                 tooltip: subMode == RapModeSubMode.auto
-                    ? 'Auto-scroll (tap to switch to manual)'
-                    : 'Manual scroll (tap to switch to auto)',
+                    ? l10n.autoScrollTooltip
+                    : l10n.manualScrollTooltip,
                 onPressed: () =>
                     ref.read(rapModeSubModeProvider.notifier).toggle(),
               ),
@@ -395,8 +396,8 @@ class _RapModeControls extends ConsumerWidget {
               : IconButton.filled(
                   iconSize: 40,
                   tooltip: virtualPlaying
-                      ? 'Pause the timer-based auto-scroll'
-                      : 'Start timer-based auto-scroll (no audio file)',
+                      ? l10n.pauseVirtualClockTooltip
+                      : l10n.startVirtualClockTooltip,
                   icon: Icon(
                     virtualPlaying ? LucideIcons.pause : LucideIcons.play,
                   ),

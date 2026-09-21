@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/projets_provider.dart';
 
-const _availableLanguages = {'fr': 'French', 'en': 'English'};
+Map<String, String> _availableLanguages(AppLocalizations l10n) => {
+  'fr': l10n.languageFrench,
+  'en': l10n.languageEnglish,
+};
 
 class NewProjectScreen extends ConsumerStatefulWidget {
   const NewProjectScreen({super.key});
@@ -41,8 +45,9 @@ class _NewProjectScreenState extends ConsumerState<NewProjectScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('New project')),
+      appBar: AppBar(title: Text(l10n.newProjectTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -52,19 +57,19 @@ class _NewProjectScreenState extends ConsumerState<NewProjectScreen> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Project name'),
+                decoration: InputDecoration(labelText: l10n.projectNameLabel),
                 validator: (value) => (value == null || value.trim().isEmpty)
-                    ? 'Please enter a name'
+                    ? l10n.projectNameRequiredError
                     : null,
                 autofocus: true,
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 initialValue: _language,
-                decoration: const InputDecoration(
-                  labelText: 'Default language',
+                decoration: InputDecoration(
+                  labelText: l10n.defaultLanguageLabel,
                 ),
-                items: _availableLanguages.entries
+                items: _availableLanguages(l10n).entries
                     .map(
                       (entry) => DropdownMenuItem(
                         value: entry.key,
@@ -85,7 +90,7 @@ class _NewProjectScreenState extends ConsumerState<NewProjectScreen> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Create'),
+                    : Text(l10n.createButton),
               ),
             ],
           ),

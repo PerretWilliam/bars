@@ -53,9 +53,10 @@ Policy: no manual implementation if a library already does it.
 
 ## Phase 6 — Polish and personal distribution
 
-- [ ] Light/dark theme via native `ThemeData`
-- [ ] `flutter_lucide` (or equivalent) integration for a consistent icon set
+- [x] Light/dark theme via native `ThemeData`
+- [x] `flutter_lucide` (or equivalent) integration for a consistent icon set
 - [ ] General UI polish (spacing, visual consistency across screens)
-- [ ] Local Android APK build for direct installation
+- [x] Local Android APK build for direct installation
 - [ ] iOS ad-hoc/personal team build via Xcode for installation on your own iPhone
 - [ ] If open source is chosen: create the public repo, write the README, pick a license
+- [x] UI localization system (`flutter_localizations` + ARB), shipping English and French — see [CLAUDE.md](CLAUDE.md)'s Language conventions for how to add a string or a language

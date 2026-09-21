@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lyrics/data/app_database.dart';
+import 'package:lyrics/l10n/app_localizations.dart';
 import 'package:lyrics/providers/audio_provider.dart';
 import 'package:lyrics/providers/database_provider.dart';
 import 'package:lyrics/providers/lignes_provider.dart';
@@ -22,7 +23,11 @@ void main() {
               .overrideWith((ref) => Stream.value(<Ligne>[])),
           projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
-        child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+        child: MaterialApp(
+          home: ProjectEditorScreen(projetId: 1),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pump();
@@ -58,7 +63,11 @@ void main() {
               .overrideWith((ref) => Stream.value([ligne])),
           projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
-        child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+        child: MaterialApp(
+          home: ProjectEditorScreen(projetId: 1),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pump();
@@ -101,7 +110,11 @@ void main() {
               .overrideWith((ref) => Stream.value([ligne])),
           projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
-        child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+        child: MaterialApp(
+          home: ProjectEditorScreen(projetId: 1),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pump();
@@ -142,7 +155,11 @@ void main() {
                 .overrideWith((ref) => Stream.value(lignes)),
             projetProvider(1).overrideWith((ref) => Stream.value(null)),
           ],
-          child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+          child: MaterialApp(
+            home: ProjectEditorScreen(projetId: 1),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+          ),
         ),
       );
       await tester.pump();
@@ -169,7 +186,11 @@ void main() {
               .overrideWith((ref) => Stream.value(lignes)),
           projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
-        child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+        child: MaterialApp(
+          home: ProjectEditorScreen(projetId: 1),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pump();
@@ -202,7 +223,11 @@ void main() {
               .overrideWith((ref) => Stream.value([ligne])),
           projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
-        child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+        child: MaterialApp(
+          home: ProjectEditorScreen(projetId: 1),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pump();
@@ -246,7 +271,11 @@ void main() {
                 .overrideWith((ref) => Stream.value(<Ligne>[])),
             projetProvider(1).overrideWith((ref) => Stream.value(projet)),
           ],
-          child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+          child: MaterialApp(
+            home: ProjectEditorScreen(projetId: 1),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+          ),
         ),
       );
       await tester.pump();
@@ -269,7 +298,11 @@ void main() {
               .overrideWith((ref) => Stream.value(<Ligne>[])),
           projetProvider(1).overrideWith((ref) => Stream.value(null)),
         ],
-        child: const MaterialApp(home: ProjectEditorScreen(projetId: 1)),
+        child: MaterialApp(
+          home: ProjectEditorScreen(projetId: 1),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pump();

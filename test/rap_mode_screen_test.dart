@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lyrics/data/app_database.dart';
+import 'package:lyrics/l10n/app_localizations.dart';
 import 'package:lyrics/providers/audio_provider.dart';
 import 'package:lyrics/providers/lignes_provider.dart';
 import 'package:lyrics/ui/screens/rap_mode_screen.dart';
@@ -38,7 +39,11 @@ void main() {
           lignesForProjetProvider(1)
               .overrideWith((ref) => Stream.value(lignes)),
         ],
-        child: const MaterialApp(home: RapModeScreen(projetId: 1)),
+        child: MaterialApp(
+          home: RapModeScreen(projetId: 1),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     await tester.pump();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/rhymes_provider.dart';
 
 class RhymeSuggestionsPanel extends ConsumerWidget {
@@ -17,6 +18,7 @@ class RhymeSuggestionsPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final rhymesAsync = ref.watch(
       rhymesForWordProvider((word: word, langue: langue)),
     );
@@ -26,7 +28,7 @@ class RhymeSuggestionsPanel extends ConsumerWidget {
       child: rhymesAsync.when(
         data: (rhymes) {
           if (rhymes.isEmpty) {
-            return const Center(child: Text('No rhymes found'));
+            return Center(child: Text(l10n.noRhymesFoundMessage));
           }
           return ListView.separated(
             scrollDirection: Axis.horizontal,
@@ -50,7 +52,7 @@ class RhymeSuggestionsPanel extends ConsumerWidget {
           ),
         ),
         error: (error, stackTrace) =>
-            Center(child: Text('Something went wrong: $error')),
+            Center(child: Text(l10n.errorGenericMessage('$error'))),
       ),
     );
   }

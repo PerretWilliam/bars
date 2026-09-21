@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lyrics/data/app_database.dart';
+import 'package:lyrics/l10n/app_localizations.dart';
 import 'package:lyrics/providers/database_provider.dart';
 import 'package:lyrics/providers/projets_provider.dart';
 import 'package:lyrics/ui/screens/project_info_screen.dart';
@@ -39,7 +40,11 @@ void main() {
           // into flutter_test's pending-timer check.
           projetProvider(projetId).overrideWith((ref) => Stream.value(projet)),
         ],
-        child: MaterialApp.router(routerConfig: router),
+        child: MaterialApp.router(
+          routerConfig: router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       ),
     );
     router.push('/info');

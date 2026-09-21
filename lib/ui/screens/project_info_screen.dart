@@ -4,9 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/projets_provider.dart';
 
-const _availableLanguages = {'fr': 'French', 'en': 'English'};
+Map<String, String> _availableLanguages(AppLocalizations l10n) => {
+  'fr': l10n.languageFrench,
+  'en': l10n.languageEnglish,
+};
 
 class ProjectInfoScreen extends ConsumerStatefulWidget {
   const ProjectInfoScreen({required this.projetId, super.key});
@@ -60,14 +64,15 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final projetAsync = ref.watch(projetProvider(widget.projetId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Project info')),
+      appBar: AppBar(title: Text(l10n.projectInfoTitle)),
       body: projetAsync.when(
         data: (projet) {
           if (projet == null) {
-            return const Center(child: Text('Project not found.'));
+            return Center(child: Text(l10n.projectNotFoundMessage));
           }
           if (!_initialized) {
             _nameController.text = projet.nom;
@@ -84,22 +89,22 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
                 children: [
                   TextFormField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Project name',
+                    decoration: InputDecoration(
+                      labelText: l10n.projectNameLabel,
                     ),
                     validator: (value) =>
                         (value == null || value.trim().isEmpty)
-                        ? 'Please enter a name'
+                        ? l10n.projectNameRequiredError
                         : null,
                     autofocus: true,
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     initialValue: _language,
-                    decoration: const InputDecoration(
-                      labelText: 'Default language',
+                    decoration: InputDecoration(
+                      labelText: l10n.defaultLanguageLabel,
                     ),
-                    items: _availableLanguages.entries
+                    items: _availableLanguages(l10n).entries
                         .map(
                           (entry) => DropdownMenuItem(
                             value: entry.key,
@@ -115,11 +120,11 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
                   TextFormField(
                     controller: _prodLinkController,
                     decoration: InputDecoration(
-                      labelText: 'Prod link (optional)',
-                      hintText: 'https://…',
+                      labelText: l10n.prodLinkLabel,
+                      hintText: l10n.prodLinkHint,
                       suffixIcon: IconButton(
                         icon: const Icon(LucideIcons.external_link),
-                        tooltip: 'Open link',
+                        tooltip: l10n.openLinkTooltip,
                         onPressed: _openProdLink,
                       ),
                     ),
@@ -130,7 +135,7 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
                       final uri = Uri.tryParse(trimmed);
                       return uri != null && uri.hasScheme
                           ? null
-                          : 'Enter a valid URL';
+                          : l10n.invalidUrlError;
                     },
                   ),
                   const SizedBox(height: 24),
@@ -142,7 +147,7 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Save'),
+                        : Text(l10n.saveButton),
                   ),
                 ],
               ),
@@ -151,7 +156,7 @@ class _ProjectInfoScreenState extends ConsumerState<ProjectInfoScreen> {
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) =>
-            Center(child: Text('Something went wrong: $error')),
+            Center(child: Text(l10n.errorGenericMessage('$error'))),
       ),
     );
   }

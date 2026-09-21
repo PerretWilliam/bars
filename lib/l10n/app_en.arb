@@ -1,0 +1,191 @@
+{
+  "@@locale": "en",
+
+  "projectsListTitle": "My projects",
+  "@projectsListTitle": {"description": "AppBar title on the projects list screen"},
+
+  "noProjectsYetTitle": "No projects yet",
+  "@noProjectsYetTitle": {"description": "Title shown when the projects list is empty"},
+
+  "noProjectsYetBody": "Tap the + button to start writing your first track.",
+  "@noProjectsYetBody": {"description": "Body text shown when the projects list is empty"},
+
+  "importingProjectMessage": "Importing project…",
+  "@importingProjectMessage": {"description": "Snackbar shown while importing a .rapproj bundle"},
+
+  "importProjectTooltip": "Import project",
+  "@importProjectTooltip": {"description": "Tooltip for the mini-FAB that imports a .rapproj bundle"},
+
+  "deleteProjectDialogTitle": "Delete project?",
+  "@deleteProjectDialogTitle": {"description": "Title of the confirmation dialog before deleting a project"},
+
+  "deleteProjectDialogBody": "This permanently deletes \"{projectName}\", its lines, and its audio file.",
+  "@deleteProjectDialogBody": {
+    "description": "Body of the confirmation dialog before deleting a project",
+    "placeholders": {
+      "projectName": {"type": "String"}
+    }
+  },
+
+  "noLinesYetPreview": "No lines yet",
+  "@noLinesYetPreview": {"description": "Short placeholder shown where a project card or Rap mode would preview its lines"},
+
+  "newProjectTitle": "New project",
+  "@newProjectTitle": {"description": "AppBar title on the new project screen"},
+
+  "projectNameLabel": "Project name",
+  "@projectNameLabel": {"description": "Label for the project name text field"},
+
+  "projectNameRequiredError": "Please enter a name",
+  "@projectNameRequiredError": {"description": "Validation error when the project name field is left empty"},
+
+  "defaultLanguageLabel": "Default language",
+  "@defaultLanguageLabel": {"description": "Label for the default-language dropdown"},
+
+  "languageFrench": "French",
+  "@languageFrench": {"description": "Name of the French language, as shown in a language picker"},
+
+  "languageEnglish": "English",
+  "@languageEnglish": {"description": "Name of the English language, as shown in a language picker"},
+
+  "createButton": "Create",
+  "@createButton": {"description": "Button that submits the new project form"},
+
+  "projectInfoTitle": "Project info",
+  "@projectInfoTitle": {"description": "AppBar title, and FAB label, for the project info/edit screen"},
+
+  "projectNotFoundMessage": "Project not found.",
+  "@projectNotFoundMessage": {"description": "Shown when the project info screen can't find the requested project"},
+
+  "prodLinkLabel": "Prod link (optional)",
+  "@prodLinkLabel": {"description": "Label for the optional production/release link text field"},
+
+  "prodLinkHint": "https://…",
+  "@prodLinkHint": {"description": "Placeholder hint for the production link text field"},
+
+  "openLinkTooltip": "Open link",
+  "@openLinkTooltip": {"description": "Tooltip for the button that opens the production link in a browser"},
+
+  "invalidUrlError": "Enter a valid URL",
+  "@invalidUrlError": {"description": "Validation error when the production link isn't a valid URL"},
+
+  "saveButton": "Save",
+  "@saveButton": {"description": "Button that submits the project info form"},
+
+  "notepadTitle": "Notepad",
+  "@notepadTitle": {"description": "AppBar title on the notepad/line editor screen"},
+
+  "showTimecodesTooltip": "Show timecodes",
+  "@showTimecodesTooltip": {"description": "Tooltip to reveal per-line timecode inputs"},
+
+  "hideTimecodesTooltip": "Hide timecodes",
+  "@hideTimecodesTooltip": {"description": "Tooltip to hide per-line timecode inputs"},
+
+  "rapModeTooltip": "Rap mode",
+  "@rapModeTooltip": {"description": "Tooltip for the button that opens the full-screen Rap mode display"},
+
+  "noLinesYetEditorMessage": "No lines yet. Tap + to start.",
+  "@noLinesYetEditorMessage": {"description": "Shown in the notepad when a project has no lines yet"},
+
+  "importingAudioMessage": "Importing audio…",
+  "@importingAudioMessage": {"description": "Snackbar shown while importing an audio file"},
+
+  "openProdLabel": "Open prod",
+  "@openProdLabel": {"description": "FAB label for opening the project's production/release link"},
+
+  "rhymeDictionariesTitle": "Rhyme dictionaries",
+  "@rhymeDictionariesTitle": {"description": "AppBar title, and FAB label, for the rhyme dictionaries screen"},
+
+  "exportProjectLabel": "Export project",
+  "@exportProjectLabel": {"description": "FAB label for exporting the project as a .rapproj bundle"},
+
+  "importAudioFileLabel": "Import audio file",
+  "@importAudioFileLabel": {"description": "FAB label for importing an audio file"},
+
+  "removeAudioTooltip": "Remove audio",
+  "@removeAudioTooltip": {"description": "Tooltip for the button that removes the project's audio file"},
+
+  "timecodeOutOfOrderTooltip": "Earlier than the previous line's timecode",
+  "@timecodeOutOfOrderTooltip": {"description": "Warning tooltip when a line's timecode is earlier than the previous line's"},
+
+  "markCurrentTimeTooltip": "Mark at current playback time",
+  "@markCurrentTimeTooltip": {"description": "Tooltip for the button that sets a line's timecode to the current playback position"},
+
+  "timecodeHint": "--:--",
+  "@timecodeHint": {"description": "Placeholder shown in an empty timecode input"},
+
+  "frenchDictionaryTitle": "French (Lexique)",
+  "@frenchDictionaryTitle": {"description": "Title of the French rhyme dictionary entry"},
+
+  "englishDictionaryTitle": "English (CMU)",
+  "@englishDictionaryTitle": {"description": "Title of the English rhyme dictionary entry"},
+
+  "dictionaryDownloadingMessage": "Downloading…",
+  "@dictionaryDownloadingMessage": {"description": "Status shown while a dictionary download's progress is unknown"},
+
+  "dictionaryDownloadingProgressMessage": "Downloading… {percent}%",
+  "@dictionaryDownloadingProgressMessage": {
+    "description": "Status shown while a dictionary download's progress is known",
+    "placeholders": {
+      "percent": {"type": "int"}
+    }
+  },
+
+  "dictionaryImportingMessage": "Importing into the database…",
+  "@dictionaryImportingMessage": {"description": "Status shown while a downloaded dictionary is being imported"},
+
+  "dictionaryFailedMessage": "Failed: {error}",
+  "@dictionaryFailedMessage": {
+    "description": "Status shown when a dictionary download or import fails",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "dictionaryDownloadedMessage": "Downloaded — available offline",
+  "@dictionaryDownloadedMessage": {"description": "Status shown when a dictionary is already downloaded"},
+
+  "dictionaryNotDownloadedMessage": "Not downloaded",
+  "@dictionaryNotDownloadedMessage": {"description": "Status shown when a dictionary hasn't been downloaded yet"},
+
+  "dictionaryCheckingMessage": "Checking…",
+  "@dictionaryCheckingMessage": {"description": "Status shown while checking whether a dictionary is downloaded"},
+
+  "downloadButton": "Download",
+  "@downloadButton": {"description": "Button that starts a dictionary download"},
+
+  "loopOnTooltip": "Loop on (tap to disable)",
+  "@loopOnTooltip": {"description": "Tooltip for the Rap mode loop toggle when loop is enabled"},
+
+  "loopOffTooltip": "Loop off (tap to enable)",
+  "@loopOffTooltip": {"description": "Tooltip for the Rap mode loop toggle when loop is disabled"},
+
+  "autoScrollTooltip": "Auto-scroll (tap to switch to manual)",
+  "@autoScrollTooltip": {"description": "Tooltip for the Rap mode scroll-mode toggle when in auto-scroll mode"},
+
+  "manualScrollTooltip": "Manual scroll (tap to switch to auto)",
+  "@manualScrollTooltip": {"description": "Tooltip for the Rap mode scroll-mode toggle when in manual-scroll mode"},
+
+  "pauseVirtualClockTooltip": "Pause the timer-based auto-scroll",
+  "@pauseVirtualClockTooltip": {"description": "Tooltip for the play/pause button when driving auto-scroll by a timer instead of audio playback"},
+
+  "startVirtualClockTooltip": "Start timer-based auto-scroll (no audio file)",
+  "@startVirtualClockTooltip": {"description": "Tooltip for the play/pause button when driving auto-scroll by a timer instead of audio playback"},
+
+  "noRhymesFoundMessage": "No rhymes found",
+  "@noRhymesFoundMessage": {"description": "Shown in the rhyme suggestions panel when no rhymes match"},
+
+  "cancelButton": "Cancel",
+  "@cancelButton": {"description": "Generic cancel button"},
+
+  "deleteButton": "Delete",
+  "@deleteButton": {"description": "Generic delete button"},
+
+  "errorGenericMessage": "Something went wrong: {error}",
+  "@errorGenericMessage": {
+    "description": "Generic error message shown when a data stream/provider fails, with the underlying error appended",
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  }
+}
