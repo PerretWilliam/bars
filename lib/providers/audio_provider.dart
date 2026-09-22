@@ -21,6 +21,20 @@ final audioPositionProvider = NotifierProvider<AudioPosition, Duration>(
   AudioPosition.new,
 );
 
+/// Bumped to tell the Notepad's `_AudioSectionState` to pause its player —
+/// e.g. right before pushing Rap mode, which has its own independent
+/// player and would otherwise play on top of it.
+class AudioPauseSignal extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void trigger() => state++;
+}
+
+final audioPauseSignalProvider = NotifierProvider<AudioPauseSignal, int>(
+  AudioPauseSignal.new,
+);
+
 /// A project has at most one active audio file: importing a new one
 /// replaces the previous row.
 final audioForProjetProvider = StreamProvider.family<Audio?, int>((

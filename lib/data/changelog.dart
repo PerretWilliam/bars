@@ -20,6 +20,15 @@ class ChangelogEntry {
 /// both `app_en.arb` and `app_fr.arb` for each one.
 final changelog = [
   ChangelogEntry(
+    version: '1.1.0',
+    date: DateTime(2026, 9, 22),
+    changes: (l10n) => [
+      l10n.changelog110StandardFormat,
+      l10n.changelog110CleanerToolbar,
+      l10n.changelog110ConsistentSpacing,
+    ],
+  ),
+  ChangelogEntry(
     version: '1.0.0',
     date: DateTime(2026, 9, 21),
     changes: (l10n) => [

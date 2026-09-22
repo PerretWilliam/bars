@@ -11,10 +11,16 @@ import '../../data/app_database.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/dossiers_provider.dart';
 import '../../providers/lignes_provider.dart';
-import '../../providers/projects_view_provider.dart';
 import '../../providers/projets_provider.dart';
 
 const _languageEmoji = {'fr': '🇫🇷', 'en': '🇬🇧'};
+
+/// The common left/right content margin used across every screen, so the
+/// projects list lines up with the AppBar's own inset instead of feeling
+/// narrower or wider than it.
+const pageHorizontalPadding = 16.0;
+
+enum _OverflowAction { import, about }
 
 class ProjectsListScreen extends ConsumerWidget {
   const ProjectsListScreen({this.dossierId, super.key});
@@ -25,7 +31,7 @@ class ProjectsListScreen extends ConsumerWidget {
   Future<void> _importProject(BuildContext context, WidgetRef ref) async {
     final files = await FilePicker.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['rapproj'],
+      allowedExtensions: ['lrcproj'],
     );
     if (files.isEmpty) return;
     final path = files.single.path;
@@ -172,7 +178,6 @@ class ProjectsListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final projetsAsync = ref.watch(projetsInDossierProvider(dossierId));
-    final viewMode = ref.watch(projectsViewModeProvider);
     final currentDossierId = dossierId;
     final dossier = currentDossierId == null
         ? null
@@ -201,29 +206,40 @@ class ProjectsListScreen extends ConsumerWidget {
               onPressed: () => _deleteFolder(context, ref, dossier),
             ),
           ],
-          IconButton(
-            icon: Icon(
-              viewMode == ProjectsViewMode.list
-                  ? LucideIcons.layout_grid
-                  : LucideIcons.list,
-            ),
-            tooltip: viewMode == ProjectsViewMode.list
-                ? l10n.viewAsGridTooltip
-                : l10n.viewAsListTooltip,
-            onPressed: () =>
-                ref.read(projectsViewModeProvider.notifier).toggle(),
+          PopupMenuButton<_OverflowAction>(
+            tooltip: l10n.moreOptionsTooltip,
+            onSelected: (action) {
+              switch (action) {
+                case _OverflowAction.import:
+                  _importProject(context, ref);
+                case _OverflowAction.about:
+                  context.push('/about');
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _OverflowAction.import,
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.folder_open),
+                    const SizedBox(width: 12),
+                    Text(l10n.importProjectTooltip),
+                  ],
+                ),
+              ),
+              if (currentDossierId == null)
+                PopupMenuItem(
+                  value: _OverflowAction.about,
+                  child: Row(
+                    children: [
+                      const Icon(LucideIcons.info),
+                      const SizedBox(width: 12),
+                      Text(l10n.aboutTooltip),
+                    ],
+                  ),
+                ),
+            ],
           ),
-          IconButton(
-            icon: const Icon(LucideIcons.folder_open),
-            tooltip: l10n.importProjectTooltip,
-            onPressed: () => _importProject(context, ref),
-          ),
-          if (currentDossierId == null)
-            IconButton(
-              icon: const Icon(LucideIcons.info),
-              tooltip: l10n.aboutTooltip,
-              onPressed: () => context.push('/about'),
-            ),
         ],
       ),
       body: projetsAsync.when(
@@ -236,21 +252,11 @@ class ProjectsListScreen extends ConsumerWidget {
             children: [
               if (folders.isNotEmpty) _FoldersRow(folders: folders),
               Expanded(
-                child: viewMode == ProjectsViewMode.list
-                    ? _ProjectsListView(
-                        projets: projets,
-                        onDeleted: (projet) =>
-                            _confirmDelete(context, ref, projet),
-                        onExported: (projet) =>
-                            _exportProject(context, ref, projet),
-                      )
-                    : _ProjectsGridView(
-                        projets: projets,
-                        onDeleted: (projet) =>
-                            _confirmDelete(context, ref, projet),
-                        onExported: (projet) =>
-                            _exportProject(context, ref, projet),
-                      ),
+                child: _ProjectsListView(
+                  projets: projets,
+                  onDeleted: (projet) => _confirmDelete(context, ref, projet),
+                  onExported: (projet) => _exportProject(context, ref, projet),
+                ),
               ),
             ],
           );
@@ -284,7 +290,7 @@ class _FoldersRow extends StatelessWidget {
       height: 48,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: pageHorizontalPadding),
         itemCount: folders.length,
         itemBuilder: (context, index) {
           final dossier = folders[index];
@@ -323,7 +329,10 @@ class _ProjectsListView extends StatelessWidget {
       itemBuilder: (context, index) {
         final projet = projets[index];
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(
+            horizontal: pageHorizontalPadding,
+            vertical: 6,
+          ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
             child: Dismissible(
@@ -346,59 +355,6 @@ class _ProjectsListView extends StatelessWidget {
                 projet: projet,
                 onTap: () => context.push('/project/${projet.id}'),
               ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _ProjectsGridView extends StatelessWidget {
-  const _ProjectsGridView({
-    required this.projets,
-    required this.onDeleted,
-    required this.onExported,
-  });
-
-  final List<Projet> projets;
-  final Future<bool> Function(Projet projet) onDeleted;
-  final _ProjectAction onExported;
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(12),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        childAspectRatio: 1.4,
-      ),
-      itemCount: projets.length,
-      itemBuilder: (context, index) {
-        final projet = projets[index];
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Dismissible(
-            key: ValueKey(projet.id),
-            confirmDismiss: (direction) =>
-                direction == DismissDirection.endToStart
-                ? onDeleted(projet)
-                : onExported(projet).then((_) => false),
-            background: const _SwipeBackground(
-              color: Colors.green,
-              icon: LucideIcons.share_2,
-              alignment: Alignment.centerLeft,
-            ),
-            secondaryBackground: const _SwipeBackground(
-              color: Colors.red,
-              icon: LucideIcons.trash,
-              alignment: Alignment.centerRight,
-            ),
-            child: _ProjectCard(
-              projet: projet,
-              onTap: () => context.push('/project/${projet.id}'),
             ),
           ),
         );

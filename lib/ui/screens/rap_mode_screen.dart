@@ -142,20 +142,13 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
     if (index == -1 || index == _lastScrolledIndex) return;
     _lastScrolledIndex = index;
     if (!_itemScrollController.isAttached) return;
-    if (_isFullyVisible(index)) return;
+    // Always re-center on the current line rather than only scrolling once
+    // it's fully off-screen, so it stays in the same spot as playback
+    // advances instead of drifting toward the viewport's edge.
     _itemScrollController.scrollTo(
       index: index,
       duration: const Duration(milliseconds: 300),
-      alignment: 0.4,
-    );
-  }
-
-  /// Avoids animating a scroll when the target line is already fully on
-  /// screen (e.g. a short project where every line already fits).
-  bool _isFullyVisible(int index) {
-    return _itemPositionsListener.itemPositions.value.any(
-      (p) =>
-          p.index == index && p.itemLeadingEdge >= 0 && p.itemTrailingEdge <= 1,
+      alignment: 0.45,
     );
   }
 
@@ -200,6 +193,7 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
     final subMode = ref.watch(rapModeSubModeProvider);
     final fontSize = ref.watch(rapModeFontSizeProvider);
     final loop = ref.watch(rapModeLoopProvider);
+    final positionMs = ref.watch(audioPositionProvider).inMilliseconds;
 
     if (audio != null) {
       unawaited(_ensurePlayerLoaded(audio));
@@ -228,6 +222,12 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                         itemBuilder: (context, index) {
                           final ligne = lignes[index];
                           final isCurrent = index == _currentLineIndex;
+                          // A line with no timecode never becomes "current"
+                          // as playback advances, so dimming it like an
+                          // upcoming line would leave it gray forever —
+                          // show it plain white instead.
+                          final isDimmed =
+                              ligne.timecodeMs != null && !isCurrent;
                           return GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () => _seekTo(ligne.timecodeMs),
@@ -237,9 +237,9 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                                 duration: const Duration(milliseconds: 250),
                                 curve: Curves.easeOut,
                                 style: TextStyle(
-                                  color: isCurrent
-                                      ? Colors.white
-                                      : Colors.white38,
+                                  color: isDimmed
+                                      ? Colors.white38
+                                      : Colors.white,
                                   fontSize: fontSize,
                                   fontWeight: FontWeight.w600,
                                   height: 1.4,
@@ -292,6 +292,9 @@ class _RapModeScreenState extends ConsumerState<RapModeScreen> {
                     player: audio != null ? _player : null,
                     virtualPlaying: _virtualPlaying,
                     onToggleVirtualClock: _toggleVirtualClock,
+                    positionMs: positionMs,
+                    durationMs: audio?.dureeMs,
+                    onSeekMs: (ms) => _seekTo(ms),
                     onExit: () {
                       Navigator.of(context).pop();
                     },
@@ -315,6 +318,9 @@ class _RapModeControls extends ConsumerWidget {
     required this.player,
     required this.virtualPlaying,
     required this.onToggleVirtualClock,
+    required this.positionMs,
+    required this.durationMs,
+    required this.onSeekMs,
     required this.onExit,
   });
 
@@ -325,6 +331,9 @@ class _RapModeControls extends ConsumerWidget {
   final AudioPlayer? player;
   final bool virtualPlaying;
   final VoidCallback onToggleVirtualClock;
+  final int positionMs;
+  final int? durationMs;
+  final ValueChanged<int> onSeekMs;
   final VoidCallback onExit;
 
   @override
@@ -333,48 +342,105 @@ class _RapModeControls extends ConsumerWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          child: Row(
-            children: [
-              IconButton(
-                icon: const Icon(LucideIcons.x, color: Colors.white),
-                onPressed: onExit,
+        // Pinned to the top as one block, independent of the scrolling
+        // lyrics below: the icon row and the seek bar move together.
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(LucideIcons.x, color: Colors.white),
+                    onPressed: onExit,
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: Icon(
+                      LucideIcons.repeat,
+                      color: loop ? Colors.deepPurpleAccent : Colors.white,
+                    ),
+                    tooltip: loop ? l10n.loopOnTooltip : l10n.loopOffTooltip,
+                    onPressed: onToggleLoop,
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      LucideIcons.a_arrow_down,
+                      color: Colors.white,
+                    ),
+                    onPressed: () =>
+                        ref.read(rapModeFontSizeProvider.notifier).decrease(),
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      LucideIcons.a_arrow_up,
+                      color: Colors.white,
+                    ),
+                    onPressed: () =>
+                        ref.read(rapModeFontSizeProvider.notifier).increase(),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      subMode == RapModeSubMode.auto
+                          ? LucideIcons.refresh_cw
+                          : LucideIcons.hand,
+                      color: Colors.white,
+                    ),
+                    tooltip: subMode == RapModeSubMode.auto
+                        ? l10n.autoScrollTooltip
+                        : l10n.manualScrollTooltip,
+                    onPressed: () =>
+                        ref.read(rapModeSubModeProvider.notifier).toggle(),
+                  ),
+                ],
               ),
-              const Spacer(),
-              IconButton(
-                icon: Icon(
-                  LucideIcons.repeat,
-                  color: loop ? Colors.deepPurpleAccent : Colors.white,
+            ),
+            if (durationMs != null && durationMs! > 0) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 3,
+                    overlayShape: SliderComponentShape.noOverlay,
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 6,
+                    ),
+                  ),
+                  child: Slider(
+                    value: positionMs.clamp(0, durationMs!).toDouble(),
+                    min: 0,
+                    max: durationMs!.toDouble(),
+                    activeColor: Colors.deepPurpleAccent,
+                    inactiveColor: Colors.white24,
+                    onChanged: (value) => onSeekMs(value.toInt()),
+                  ),
                 ),
-                tooltip: loop ? l10n.loopOnTooltip : l10n.loopOffTooltip,
-                onPressed: onToggleLoop,
               ),
-              IconButton(
-                icon: const Icon(LucideIcons.a_arrow_down, color: Colors.white),
-                onPressed: () =>
-                    ref.read(rapModeFontSizeProvider.notifier).decrease(),
-              ),
-              IconButton(
-                icon: const Icon(LucideIcons.a_arrow_up, color: Colors.white),
-                onPressed: () =>
-                    ref.read(rapModeFontSizeProvider.notifier).increase(),
-              ),
-              IconButton(
-                icon: Icon(
-                  subMode == RapModeSubMode.auto
-                      ? LucideIcons.refresh_cw
-                      : LucideIcons.hand,
-                  color: Colors.white,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _formatMs(positionMs),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                    Text(
+                      _formatMs(durationMs!),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
-                tooltip: subMode == RapModeSubMode.auto
-                    ? l10n.autoScrollTooltip
-                    : l10n.manualScrollTooltip,
-                onPressed: () =>
-                    ref.read(rapModeSubModeProvider.notifier).toggle(),
               ),
             ],
-          ),
+          ],
         ),
         Padding(
           padding: const EdgeInsets.only(bottom: 24),
@@ -407,4 +473,11 @@ class _RapModeControls extends ConsumerWidget {
       ],
     );
   }
+}
+
+String _formatMs(int ms) {
+  final totalSeconds = ms ~/ 1000;
+  final minutes = totalSeconds ~/ 60;
+  final seconds = totalSeconds % 60;
+  return '$minutes:${seconds.toString().padLeft(2, '0')}';
 }

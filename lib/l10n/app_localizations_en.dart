@@ -218,10 +218,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noFolderOption => 'None';
 
   @override
-  String get viewAsListTooltip => 'View as list';
-
-  @override
-  String get viewAsGridTooltip => 'View as grid';
+  String get moreOptionsTooltip => 'More options';
 
   @override
   String get aboutTooltip => 'About';
@@ -280,7 +277,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get legalContentBody =>
-      'Lyrics and projects you write remain entirely your own. You can export them as .rapproj files or delete them at any time; nothing is retained anywhere else.';
+      'Lyrics and projects you write remain entirely your own. You can export them as .lrcproj files — a standard LRC document plus your audio, readable outside Bars too — or delete them at any time; nothing is retained anywhere else.';
 
   @override
   String get legalLicenseTitle => 'License';
@@ -343,4 +340,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get changelog100FoldersAndInfo =>
       'Folders, a list/grid view toggle, and app info/legal/donate pages';
+
+  @override
+  String get changelog110StandardFormat =>
+      'Projects now export as .lrcproj: a standard LRC lyrics file plus your audio, readable outside Bars too — replacing the old proprietary .rapproj format';
+
+  @override
+  String get changelog110CleanerToolbar =>
+      'Simplified the projects screen toolbar: import and app info now live in a single \"⋮\" menu, and the grid view was removed in favor of a single clear list';
+
+  @override
+  String get changelog110ConsistentSpacing =>
+      'Made left/right spacing consistent across every screen';
 }

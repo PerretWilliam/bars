@@ -224,10 +224,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noFolderOption => 'Aucun';
 
   @override
-  String get viewAsListTooltip => 'Afficher en liste';
-
-  @override
-  String get viewAsGridTooltip => 'Afficher en grille';
+  String get moreOptionsTooltip => 'Plus d\'options';
 
   @override
   String get aboutTooltip => 'À propos';
@@ -287,7 +284,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get legalContentBody =>
-      'Les paroles et projets que tu écris restent entièrement les tiens. Tu peux les exporter sous forme de fichiers .rapproj ou les supprimer à tout moment ; rien n\'est conservé ailleurs.';
+      'Les paroles et projets que tu écris restent entièrement les tiens. Tu peux les exporter sous forme de fichiers .lrcproj — un fichier LRC standard accompagné de ton audio, lisible aussi en dehors de Bars — ou les supprimer à tout moment ; rien n\'est conservé ailleurs.';
 
   @override
   String get legalLicenseTitle => 'Licence';
@@ -350,4 +347,16 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get changelog100FoldersAndInfo =>
       'Dossiers, affichage en liste ou en grille, et pages d\'infos, mentions légales et don';
+
+  @override
+  String get changelog110StandardFormat =>
+      'Les projets s\'exportent maintenant en .lrcproj : un fichier de paroles LRC standard accompagné de ton audio, lisible aussi en dehors de Bars — remplace l\'ancien format propriétaire .rapproj';
+
+  @override
+  String get changelog110CleanerToolbar =>
+      'Barre d\'outils de l\'écran des projets simplifiée : l\'import et les infos de l\'app sont maintenant dans un seul menu « ⋮ », et la vue en grille a été retirée au profit d\'une liste unique et claire';
+
+  @override
+  String get changelog110ConsistentSpacing =>
+      'Marges gauche/droite rendues cohérentes sur tous les écrans';
 }

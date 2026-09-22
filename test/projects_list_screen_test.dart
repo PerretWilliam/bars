@@ -10,7 +10,9 @@ import 'package:lyrics/ui/screens/projects_list_screen.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 
 void main() {
-  testWidgets('import is always available from the AppBar', (tester) async {
+  testWidgets('import is always available from the overflow menu', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -28,7 +30,12 @@ void main() {
     await tester.pump();
 
     expect(find.text('No projects yet'), findsOneWidget);
-    expect(find.byTooltip('Import project'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('More options'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Import project'), findsOneWidget);
+    expect(find.text('About'), findsOneWidget);
   });
 
   testWidgets('long-pressing the + FAB reveals the new-folder action', (

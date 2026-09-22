@@ -21,8 +21,8 @@
 - **Notepad** — write and reorder lines, with live rhyme suggestions (French and English dictionaries) and per-line timecodes.
 - **Timecoded mode** — import an audio file and mark each line at its exact moment in the track.
 - **Rap mode** — a clean, full-screen, auto-scrolling display synced to playback, for the studio or the stage.
-- **Export/import** — package a project (lines, timecodes, audio) into a `.rapproj` bundle to back up or move between devices.
-- **Folders and views** — organize projects into folders, and browse them as a list or a grid.
+- **Export/import** — package a project (lines, timecodes, audio) into a `.lrcproj` bundle: a standard `.lrc` lyrics file plus your audio, so it's readable outside Bars too, not just to back up or move between devices.
+- **Folders** — organize projects into folders.
 - **Localized UI** — ships in English and French.
 
 See [ROADMAP.md](ROADMAP.md) for the phased implementation plan and [CLAUDE.md](CLAUDE.md) for contributor guidance.

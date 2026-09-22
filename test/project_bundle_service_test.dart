@@ -57,9 +57,9 @@ void main() {
     );
 
     final export = await service.exportProject(projetId);
-    expect(export.fileName, 'Test project.rapproj');
+    expect(export.fileName, 'Test project.lrcproj');
 
-    final zipFile = File('${scratchDir.path}/export.rapproj');
+    final zipFile = File('${scratchDir.path}/export.lrcproj');
     await zipFile.writeAsBytes(export.bytes);
     final newProjetId = await service.importBundle(zipFile);
 
@@ -98,7 +98,7 @@ void main() {
         );
 
     final export = await service.exportProject(projetId);
-    final zipFile = File('${scratchDir.path}/export.rapproj');
+    final zipFile = File('${scratchDir.path}/export.lrcproj');
     await zipFile.writeAsBytes(export.bytes);
     final newProjetId = await service.importBundle(zipFile);
 

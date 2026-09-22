@@ -35,10 +35,10 @@ Policy: no manual implementation if a library already does it.
 
 ## Phase 4 — Export and file management
 
-- [x] Serialize a full project to JSON (lines, timecodes, metadata)
-- [x] `archive` integration: package into a `.rapproj` bundle (JSON + copied audio file)
+- [x] ~~Serialize a full project to JSON (lines, timecodes, metadata)~~ → replaced by a standard `.lrc` lyrics document (see below), so exports are readable outside Bars too
+- [x] `archive` integration: package into a `.lrcproj` bundle (`.lrc` + copied audio file)
 - [x] Export the bundle via `file_picker` (choose destination folder)
-- [x] Import a `.rapproj` bundle: deserialize and fully restore into the database
+- [x] Import a `.lrcproj` bundle: parse the LRC and fully restore into the database
 - [x] Clean project deletion, including cleanup of the associated audio file on disk
 
 ## Phase 5 — Rap mode

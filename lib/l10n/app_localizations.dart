@@ -116,13 +116,13 @@ abstract class AppLocalizations {
   /// **'Tap the + button to start writing your first track.'**
   String get noProjectsYetBody;
 
-  /// Snackbar shown while importing a .rapproj bundle
+  /// Snackbar shown while importing a .lrcproj bundle
   ///
   /// In en, this message translates to:
   /// **'Importing project…'**
   String get importingProjectMessage;
 
-  /// Tooltip for the mini-FAB that imports a .rapproj bundle
+  /// Label/tooltip for the overflow-menu action that imports a .lrcproj bundle
   ///
   /// In en, this message translates to:
   /// **'Import project'**
@@ -278,7 +278,7 @@ abstract class AppLocalizations {
   /// **'Rhyme dictionaries'**
   String get rhymeDictionariesTitle;
 
-  /// FAB label for exporting the project as a .rapproj bundle
+  /// FAB label for exporting the project as a .lrcproj bundle
   ///
   /// In en, this message translates to:
   /// **'Export project'**
@@ -488,17 +488,11 @@ abstract class AppLocalizations {
   /// **'None'**
   String get noFolderOption;
 
-  /// Tooltip to switch the projects screen to list view
+  /// Tooltip for the overflow (⋮) menu button on the projects list AppBar
   ///
   /// In en, this message translates to:
-  /// **'View as list'**
-  String get viewAsListTooltip;
-
-  /// Tooltip to switch the projects screen to grid view
-  ///
-  /// In en, this message translates to:
-  /// **'View as grid'**
-  String get viewAsGridTooltip;
+  /// **'More options'**
+  String get moreOptionsTooltip;
 
   /// Tooltip for the AppBar action that opens the About screen
   ///
@@ -605,7 +599,7 @@ abstract class AppLocalizations {
   /// Legal screen section body
   ///
   /// In en, this message translates to:
-  /// **'Lyrics and projects you write remain entirely your own. You can export them as .rapproj files or delete them at any time; nothing is retained anywhere else.'**
+  /// **'Lyrics and projects you write remain entirely your own. You can export them as .lrcproj files — a standard LRC document plus your audio, readable outside Bars too — or delete them at any time; nothing is retained anywhere else.'**
   String get legalContentBody;
 
   /// Legal screen section title
@@ -709,6 +703,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Folders, a list/grid view toggle, and app info/legal/donate pages'**
   String get changelog100FoldersAndInfo;
+
+  /// Changelog bullet for version 1.1.0
+  ///
+  /// In en, this message translates to:
+  /// **'Projects now export as .lrcproj: a standard LRC lyrics file plus your audio, readable outside Bars too — replacing the old proprietary .rapproj format'**
+  String get changelog110StandardFormat;
+
+  /// Changelog bullet for version 1.1.0
+  ///
+  /// In en, this message translates to:
+  /// **'Simplified the projects screen toolbar: import and app info now live in a single \"⋮\" menu, and the grid view was removed in favor of a single clear list'**
+  String get changelog110CleanerToolbar;
+
+  /// Changelog bullet for version 1.1.0
+  ///
+  /// In en, this message translates to:
+  /// **'Made left/right spacing consistent across every screen'**
+  String get changelog110ConsistentSpacing;
 }
 
 class _AppLocalizationsDelegate

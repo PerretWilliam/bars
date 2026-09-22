@@ -85,7 +85,10 @@ class ProjectEditorScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(LucideIcons.play),
             tooltip: l10n.rapModeTooltip,
-            onPressed: () => context.push('/project/$projetId/rap'),
+            onPressed: () {
+              ref.read(audioPauseSignalProvider.notifier).trigger();
+              context.push('/project/$projetId/rap');
+            },
           ),
         ],
       ),
@@ -417,6 +420,10 @@ class _AudioSectionState extends ConsumerState<_AudioSection> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<int>(audioPauseSignalProvider, (previous, next) {
+      if (previous != null && next != previous) _player.pause();
+    });
+
     final waveform = _waveform;
     final totalDuration = Duration(milliseconds: widget.audio.dureeMs);
 

@@ -66,8 +66,7 @@
   "deleteFolderDialogBody": "Ceci supprime « {folderName} ». Ses projets reviennent dans la liste principale — ils ne sont pas supprimés.",
   "folderLabel": "Dossier",
   "noFolderOption": "Aucun",
-  "viewAsListTooltip": "Afficher en liste",
-  "viewAsGridTooltip": "Afficher en grille",
+  "moreOptionsTooltip": "Plus d'options",
   "aboutTooltip": "À propos",
   "aboutTitle": "À propos",
   "appVersionLabel": "Version {version}",
@@ -85,7 +84,7 @@
   "legalDataTitle": "Données personnelles",
   "legalDataBody": "Bars n'a ni backend ni compte utilisateur. Tout ce que tu crées — projets, paroles, timecodes, audio importé — reste stocké localement sur ton appareil et n'est jamais envoyé ni stocké sur un serveur. L'app n'utilise ni analytics, ni publicité, ni traceur d'aucune sorte.",
   "legalContentTitle": "Ton contenu",
-  "legalContentBody": "Les paroles et projets que tu écris restent entièrement les tiens. Tu peux les exporter sous forme de fichiers .rapproj ou les supprimer à tout moment ; rien n'est conservé ailleurs.",
+  "legalContentBody": "Les paroles et projets que tu écris restent entièrement les tiens. Tu peux les exporter sous forme de fichiers .lrcproj — un fichier LRC standard accompagné de ton audio, lisible aussi en dehors de Bars — ou les supprimer à tout moment ; rien n'est conservé ailleurs.",
   "legalLicenseTitle": "Licence",
   "legalLicenseBody": "Bars est un logiciel open source publié sous licence MIT. Son code source est disponible publiquement sur github.com/PerretWilliam/bars.",
   "legalContactTitle": "Contact",
@@ -102,5 +101,8 @@
   "changelog100RapMode": "Mode rap : un affichage plein écran à défilement automatique synchronisé sur la lecture",
   "changelog100ExportImport": "Exporte et importe des projets sous forme de bundles .rapproj",
   "changelog100ThemeAndIcons": "Thème clair et sombre, un jeu d'icônes complet, et une interface traduite en français et en anglais",
-  "changelog100FoldersAndInfo": "Dossiers, affichage en liste ou en grille, et pages d'infos, mentions légales et don"
+  "changelog100FoldersAndInfo": "Dossiers, affichage en liste ou en grille, et pages d'infos, mentions légales et don",
+  "changelog110StandardFormat": "Les projets s'exportent maintenant en .lrcproj : un fichier de paroles LRC standard accompagné de ton audio, lisible aussi en dehors de Bars — remplace l'ancien format propriétaire .rapproj",
+  "changelog110CleanerToolbar": "Barre d'outils de l'écran des projets simplifiée : l'import et les infos de l'app sont maintenant dans un seul menu « ⋮ », et la vue en grille a été retirée au profit d'une liste unique et claire",
+  "changelog110ConsistentSpacing": "Marges gauche/droite rendues cohérentes sur tous les écrans"
 }

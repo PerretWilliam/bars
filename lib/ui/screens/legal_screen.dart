@@ -12,7 +12,7 @@ class LegalScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.legalTitle)),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         children: [
           _LegalSection(
             title: l10n.legalPublisherTitle,

@@ -18,7 +18,7 @@ class DonateScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.donateTitle)),
       body: ListView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         children: [
           Text(l10n.donateIntro),
           const SizedBox(height: 24),

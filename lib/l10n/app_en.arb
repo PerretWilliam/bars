@@ -11,10 +11,10 @@
   "@noProjectsYetBody": {"description": "Body text shown when the projects list is empty"},
 
   "importingProjectMessage": "Importing project…",
-  "@importingProjectMessage": {"description": "Snackbar shown while importing a .rapproj bundle"},
+  "@importingProjectMessage": {"description": "Snackbar shown while importing a .lrcproj bundle"},
 
   "importProjectTooltip": "Import project",
-  "@importProjectTooltip": {"description": "Tooltip for the mini-FAB that imports a .rapproj bundle"},
+  "@importProjectTooltip": {"description": "Label/tooltip for the overflow-menu action that imports a .lrcproj bundle"},
 
   "deleteProjectDialogTitle": "Delete project?",
   "@deleteProjectDialogTitle": {"description": "Title of the confirmation dialog before deleting a project"},
@@ -97,7 +97,7 @@
   "@rhymeDictionariesTitle": {"description": "AppBar title, and FAB label, for the rhyme dictionaries screen"},
 
   "exportProjectLabel": "Export project",
-  "@exportProjectLabel": {"description": "FAB label for exporting the project as a .rapproj bundle"},
+  "@exportProjectLabel": {"description": "FAB label for exporting the project as a .lrcproj bundle"},
 
   "importAudioFileLabel": "Import audio file",
   "@importAudioFileLabel": {"description": "FAB label for importing an audio file"},
@@ -221,11 +221,8 @@
   "noFolderOption": "None",
   "@noFolderOption": {"description": "Option in the folder-picker dropdown meaning the project has no folder"},
 
-  "viewAsListTooltip": "View as list",
-  "@viewAsListTooltip": {"description": "Tooltip to switch the projects screen to list view"},
-
-  "viewAsGridTooltip": "View as grid",
-  "@viewAsGridTooltip": {"description": "Tooltip to switch the projects screen to grid view"},
+  "moreOptionsTooltip": "More options",
+  "@moreOptionsTooltip": {"description": "Tooltip for the overflow (⋮) menu button on the projects list AppBar"},
 
   "aboutTooltip": "About",
   "@aboutTooltip": {"description": "Tooltip for the AppBar action that opens the About screen"},
@@ -283,7 +280,7 @@
   "legalContentTitle": "Your content",
   "@legalContentTitle": {"description": "Legal screen section title"},
 
-  "legalContentBody": "Lyrics and projects you write remain entirely your own. You can export them as .rapproj files or delete them at any time; nothing is retained anywhere else.",
+  "legalContentBody": "Lyrics and projects you write remain entirely your own. You can export them as .lrcproj files — a standard LRC document plus your audio, readable outside Bars too — or delete them at any time; nothing is retained anywhere else.",
   "@legalContentBody": {"description": "Legal screen section body"},
 
   "legalLicenseTitle": "License",
@@ -341,5 +338,14 @@
   "@changelog100ThemeAndIcons": {"description": "Changelog bullet for version 1.0.0"},
 
   "changelog100FoldersAndInfo": "Folders, a list/grid view toggle, and app info/legal/donate pages",
-  "@changelog100FoldersAndInfo": {"description": "Changelog bullet for version 1.0.0"}
+  "@changelog100FoldersAndInfo": {"description": "Changelog bullet for version 1.0.0"},
+
+  "changelog110StandardFormat": "Projects now export as .lrcproj: a standard LRC lyrics file plus your audio, readable outside Bars too — replacing the old proprietary .rapproj format",
+  "@changelog110StandardFormat": {"description": "Changelog bullet for version 1.1.0"},
+
+  "changelog110CleanerToolbar": "Simplified the projects screen toolbar: import and app info now live in a single \"⋮\" menu, and the grid view was removed in favor of a single clear list",
+  "@changelog110CleanerToolbar": {"description": "Changelog bullet for version 1.1.0"},
+
+  "changelog110ConsistentSpacing": "Made left/right spacing consistent across every screen",
+  "@changelog110ConsistentSpacing": {"description": "Changelog bullet for version 1.1.0"}
 }

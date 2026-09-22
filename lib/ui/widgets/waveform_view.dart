@@ -15,7 +15,7 @@ class WaveformView extends StatelessWidget {
   final Duration duration;
   final ValueChanged<Duration> onSeek;
 
-  void _handleTap(BoxConstraints constraints, Offset localPosition) {
+  void _handleSeek(BoxConstraints constraints, Offset localPosition) {
     if (duration.inMilliseconds == 0) return;
     final fraction = (localPosition.dx / constraints.maxWidth).clamp(0.0, 1.0);
     onSeek(duration * fraction);
@@ -26,7 +26,11 @@ class WaveformView extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         return GestureDetector(
-          onTapUp: (details) => _handleTap(constraints, details.localPosition),
+          onTapUp: (details) => _handleSeek(constraints, details.localPosition),
+          onHorizontalDragStart: (details) =>
+              _handleSeek(constraints, details.localPosition),
+          onHorizontalDragUpdate: (details) =>
+              _handleSeek(constraints, details.localPosition),
           child: CustomPaint(
             size: Size(constraints.maxWidth, constraints.maxHeight),
             painter: _WaveformPainter(
@@ -36,6 +40,7 @@ class WaveformView extends StatelessWidget {
                   : position.inMilliseconds / duration.inMilliseconds,
               color: Theme.of(context).colorScheme.primary,
               playedColor: Theme.of(context).colorScheme.secondary,
+              cursorColor: Theme.of(context).colorScheme.tertiary,
             ),
           ),
         );
@@ -50,12 +55,14 @@ class _WaveformPainter extends CustomPainter {
     required this.progress,
     required this.color,
     required this.playedColor,
+    required this.cursorColor,
   });
 
   final Waveform waveform;
   final double progress;
   final Color color;
   final Color playedColor;
+  final Color cursorColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -78,6 +85,19 @@ class _WaveformPainter extends CustomPainter {
         paint,
       );
     }
+
+    canvas.drawLine(
+      Offset(playedWidth, 0),
+      Offset(playedWidth, size.height),
+      Paint()
+        ..color = cursorColor
+        ..strokeWidth = 2,
+    );
+    canvas.drawCircle(
+      Offset(playedWidth, middle),
+      5,
+      Paint()..color = cursorColor,
+    );
   }
 
   @override
@@ -85,6 +105,7 @@ class _WaveformPainter extends CustomPainter {
     return oldDelegate.waveform != waveform ||
         oldDelegate.progress != progress ||
         oldDelegate.color != color ||
-        oldDelegate.playedColor != playedColor;
+        oldDelegate.playedColor != playedColor ||
+        oldDelegate.cursorColor != cursorColor;
   }
 }

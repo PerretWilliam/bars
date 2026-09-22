@@ -17,7 +17,7 @@ class ChangelogScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l10n.changelogTitle)),
       body: ListView.builder(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
         itemCount: changelog.length,
         itemBuilder: (context, index) {
           final entry = changelog[index];

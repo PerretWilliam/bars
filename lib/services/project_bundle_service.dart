@@ -7,10 +7,10 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../data/app_database.dart';
-import '../models/project_bundle.dart';
 import 'audio_file_manager.dart';
+import 'lrc_codec.dart';
 
-const _projectJsonEntry = 'project.json';
+const _lyricsLrcEntry = 'lyrics.lrc';
 
 class ProjectExport {
   const ProjectExport({required this.bytes, required this.fileName});
@@ -38,12 +38,20 @@ class ProjectBundleService {
       _db.audios,
     )..where((row) => row.projetId.equals(projetId))).getSingleOrNull();
 
-    final bundle = ProjectBundle(projet: projet, lignes: lignes, audio: audio);
-    final archive = Archive();
-    final jsonBytes = utf8.encode(jsonEncode(bundle.toJson()));
-    archive.addFile(
-      ArchiveFile(_projectJsonEntry, jsonBytes.length, jsonBytes),
+    final lrcProject = LrcProject(
+      title: projet.nom,
+      language: projet.langueParDefaut,
+      createdAt: projet.createdAt,
+      prodLink: projet.lienProd,
+      audioDurationMs: audio?.dureeMs,
+      lines: lignes
+          .map((l) => LrcLine(text: l.texte, timecodeMs: l.timecodeMs))
+          .toList(),
     );
+
+    final archive = Archive();
+    final lrcBytes = utf8.encode(encodeLrc(lrcProject));
+    archive.addFile(ArchiveFile(_lyricsLrcEntry, lrcBytes.length, lrcBytes));
 
     if (audio != null) {
       final audioBytes = await File(audio.cheminLocal).readAsBytes();
@@ -57,7 +65,7 @@ class ProjectBundleService {
     final safeName = projet.nom
         .replaceAll(RegExp(r'[^A-Za-z0-9 _-]'), '')
         .trim();
-    final fileName = '${safeName.isEmpty ? 'project' : safeName}.rapproj';
+    final fileName = '${safeName.isEmpty ? 'project' : safeName}.lrcproj';
 
     return ProjectExport(
       bytes: Uint8List.fromList(zipBytes),
@@ -69,12 +77,10 @@ class ProjectBundleService {
     final bytes = await bundleFile.readAsBytes();
     final archive = ZipDecoder().decodeBytes(bytes);
 
-    final jsonEntry = archive.files.firstWhere(
-      (file) => file.name == _projectJsonEntry,
+    final lrcEntry = archive.files.firstWhere(
+      (file) => file.name == _lyricsLrcEntry,
     );
-    final bundle = ProjectBundle.fromJson(
-      jsonDecode(utf8.decode(jsonEntry.content)) as Map<String, dynamic>,
-    );
+    final lrcProject = decodeLrc(utf8.decode(lrcEntry.content));
 
     ArchiveFile? audioEntry;
     for (final file in archive.files) {
@@ -89,28 +95,29 @@ class ProjectBundleService {
           .into(_db.projets)
           .insert(
             ProjetsCompanion(
-              nom: Value(bundle.projet.nom),
-              langueParDefaut: Value(bundle.projet.langueParDefaut),
-              createdAt: Value(bundle.projet.createdAt),
+              nom: Value(lrcProject.title),
+              langueParDefaut: Value(lrcProject.language),
+              createdAt: Value(lrcProject.createdAt),
+              lienProd: Value(lrcProject.prodLink),
             ),
           );
 
-      for (final ligne in bundle.lignes) {
+      for (var i = 0; i < lrcProject.lines.length; i++) {
+        final ligne = lrcProject.lines[i];
         await _db
             .into(_db.lignes)
             .insert(
               LignesCompanion.insert(
                 projetId: newProjetId,
-                texte: ligne.texte,
-                ordre: ligne.ordre,
-                langueDetectee: Value(ligne.langueDetectee),
+                texte: ligne.text,
+                ordre: i,
                 timecodeMs: Value(ligne.timecodeMs),
               ),
             );
       }
 
       final entry = audioEntry;
-      if (entry != null && bundle.audio != null) {
+      if (entry != null) {
         final tempDir = await getTemporaryDirectory();
         final tempFile = File(p.join(tempDir.path, entry.name));
         await tempFile.writeAsBytes(entry.content);
@@ -123,7 +130,7 @@ class ProjectBundleService {
               AudiosCompanion.insert(
                 projetId: newProjetId,
                 cheminLocal: copied.path,
-                dureeMs: bundle.audio!.dureeMs,
+                dureeMs: lrcProject.audioDurationMs ?? 0,
               ),
             );
       }
